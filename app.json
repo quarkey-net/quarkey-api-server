@@ -2,6 +2,6 @@
     "name": "Quarkey Development Api",
     "description": "Backend api to manage password",
     "repository": "https://github.com/PowerSaucisse/QuarKEY-api-server",
-    "logo": "https://github.com/PowerSaucisse/QuarKEY-api-server/blob/dev/assets/img/quarkey-full.png?raw=true",
+    "logo": "https://github.com/PowerSaucisse/QuarKEY-api-server/blob/dev/assets/img/quarkey.png?raw=true",
     "keywords": ["python", "api", "rest", "password"]
 }
