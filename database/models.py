@@ -12,7 +12,8 @@ class PgSQLBaseModel(peewee.Model):
         return cls
 
 
-class Accounts(PgSQLBaseModel):
+
+class SQLAccounts(PgSQLBaseModel):
     """ SQL Accounts database table """
 
     uid                 = peewee.TextField(null=False, primary_key=True, unique=True)
@@ -37,12 +38,13 @@ class Accounts(PgSQLBaseModel):
         table_name = 'accounts'
 
 
-class PasswordItems(PgSQLBaseModel):
+
+class SQLPasswords(PgSQLBaseModel):
     """ SQL Database table to describe Password slot items """
 
     id                  = peewee.UUIDField(primary_key=True, null=False, unique=True)
 
-    f_owner             = peewee.ForeignKeyField(Accounts, backref="password_items")
+    f_owner             = peewee.ForeignKeyField(SQLAccounts, backref="password_items")
     title               = peewee.TextField(null=False, unique=False)
     description         = peewee.TextField(null=True, unique=False)
     username            = peewee.TextField(null=True, unique=False)
@@ -53,22 +55,35 @@ class PasswordItems(PgSQLBaseModel):
     created_on          = peewee.DateTimeField(null=False, unique=False, default=datetime.datetime.utcnow())
 
     class Meta:
-        table_name = 'password_items'
+        table_name = 'passwords'
 
 
-class PasswordTags(PgSQLBaseModel):
+
+class SQLTags(PgSQLBaseModel):
     """ SQL Database table to describe tags and color for an item password """
 
     id                  = peewee.BigIntegerField(null=False, unique=True, primary_key=True)
     name                = peewee.TextField(null=False, unique=False)
     color               = peewee.TextField(null=False, unique=False)
-    f_item              = peewee.ForeignKeyField(PasswordItems, backref="password_tags")
 
     class Meta:
-        table_name = 'password_tags'
+        table_name = 'tags'
 
 
-class AuthToken(PgSQLBaseModel):
+
+class SQLPasswordsTags(PgSQLBaseModel):
+    """ Many to many SQL database table (password_items <-> tags) """
+    id                  = peewee.BigIntegerField(null=False, unique=True, primary_key=True)
+    f_item              = peewee.ForeignKeyField(SQLPasswords, null=False, unique=False)
+    f_tag               = peewee.ForeignKeyField(SQLTags, null=True, unique=False)
+    # f_org             = peewee.ForeignKeyField(null=False, unqiue=False)
+
+    class Meta:
+        table_name = "passwords_tags"
+
+
+
+class SQLAuthToken(PgSQLBaseModel):
     """ SQL database table to describe rsa keypair for specific service"""
     # id
     token_type          = peewee.TextField(null=False, unique=True)

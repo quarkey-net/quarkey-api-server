@@ -1,5 +1,5 @@
 import falcon, datetime
-from database.models import Accounts
+from database.models import SQLAccounts
 from utils.base import api_message, api_validate_form
 from utils.security.auth import AccountAuthToken, UserPasswordHasher
 from utils.config import AppState
@@ -28,15 +28,15 @@ class Login(object):
 
         if api_validate_form(req.media, self.get_form):
             try:
-                q1 = Accounts.select(
-                    Accounts.uid,
-                    Accounts.firstname,
-                    Accounts.lastname,
-                    Accounts.password,
-                    # peewee.fn.CONCAT(Accounts.firstname, ' ', Accounts.lastname).alias('fullname'),
-                    Accounts.role,
-                    Accounts.premium_expiration
-                ).where((Accounts.is_banned == False) & (Accounts.is_verified == True) & (Accounts.uid == req.media['uid'])).limit(1).dicts()
+                q1 = SQLAccounts.select(
+                    SQLAccounts.uid,
+                    SQLAccounts.firstname,
+                    SQLAccounts.lastname,
+                    SQLAccounts.password,
+                    # peewee.fn.CONCAT(SQLAccounts.firstname, ' ', SQLAccounts.lastname).alias('fullname'),
+                    SQLAccounts.role,
+                    SQLAccounts.premium_expiration
+                ).where((SQLAccounts.is_banned == False) & (SQLAccounts.is_verified == True) & (SQLAccounts.uid == req.media['uid'])).limit(1).dicts()
             except Exception as e:
                 api_message('w', f'Failed to request database to login account : {e}')
                 resp.status = falcon.HTTP_500

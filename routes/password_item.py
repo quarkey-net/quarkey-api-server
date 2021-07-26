@@ -3,7 +3,7 @@ import falcon, uuid, datetime
 
 from routes.middleware import AuthorizeAccount
 from utils.base import api_validate_form, api_message
-from database.models import PasswordItems
+from database.models import SQLPasswords
 from utils.config import AppState
 
 
@@ -32,9 +32,9 @@ class PasswordItem(object):
             payload = self._token_controller.decode(req.get_header('Authorization'))
 
             try:
-                q1 = PasswordItems.select(
-                    PasswordItems.id
-                ).where((PasswordItems.f_owner == payload['uid']) & (PasswordItems.title == req.media['title']))
+                q1 = SQLPasswords.select(
+                    SQLPasswords.id
+                ).where((SQLPasswords.f_owner == payload['uid']) & (SQLPasswords.title == req.media['title']))
             except Exception as e:
                 api_message("d", f'failed to get item {e}')
                 raise falcon.HTTPBadRequest(title="BAD_REQUEST", description="failed to get item")
@@ -46,7 +46,7 @@ class PasswordItem(object):
 
             datenow = datetime.datetime.utcnow()
             try:
-                q2 = PasswordItems.create(
+                q2 = SQLPasswords.create(
                     id=uuid.uuid4(),
                     f_owner=payload['uid'],
                     title=req.media['title'],
@@ -63,6 +63,7 @@ class PasswordItem(object):
             
         resp.status = falcon.HTTP_CREATED
         resp.media  = {"title": "CREATED", "description": "resource created successful"}
+
 
 
 """

@@ -1,7 +1,7 @@
 from __future__ import print_function
 import datetime, peewee, falcon, jsonschema, sys, logging, os
 from utils.config import AppState
-from database.models import AuthToken
+from database.models import SQLAuthToken
 from database.database import db
 
 # EMAIL = yagmail.SMTP(API_DEV_EMAIL_EXPEDITOR, API_DEV_EMAIL_PASSWORD)
@@ -80,7 +80,7 @@ def get_rsa_keypair(token_type: str = None) -> list:
     if db.is_closed():
         db.connect()
     try:
-        q = AuthToken.select(AuthToken.public_key, AuthToken.private_key).where(AuthToken.token_type == token_type).dicts()
+        q = SQLAuthToken.select(SQLAuthToken.public_key, SQLAuthToken.private_key).where(SQLAuthToken.token_type == token_type).dicts()
     except peewee.DatabaseError as e:
         print(f'[ ERROR ] - Database error, failed to make request : {e}')
         exit(0)

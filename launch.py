@@ -5,7 +5,7 @@
 import platform, os, peewee, logging, falcon, argparse
 
 from database.database import db
-from database.models import Accounts, PasswordItems, AuthToken
+from database.models import SQLAccounts, SQLPasswords, SQLAuthToken
 
 from routes.register import Register
 from routes.login import Login
@@ -62,7 +62,7 @@ except Exception as e:
 
 middlewares: list = []
 if AppState.TAG in ['dev', 'test']:
-    db.create_tables([Accounts, PasswordItems, AuthToken], safe=True)
+    db.create_tables([SQLAccounts, SQLPasswords, SQLAuthToken], safe=True)
     middlewares.append(CORSMiddleware())
     middlewares.append(DebugMiddleware())
 

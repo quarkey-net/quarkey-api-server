@@ -3,7 +3,7 @@ from utils.security.auth import UserPasswordHasher, gen_account_keypair
 from utils.config import AppState
 from utils.base import api_validate_form, api_message
 
-from database.models import Accounts
+from database.models import SQLAccounts
 
 class Register(object):
 
@@ -36,7 +36,7 @@ class Register(object):
 
         if api_validate_form(req.media, self.post_form):
             try:
-                q1 = Accounts.get_or_none((Accounts.uid == req.media["uid"]) | (Accounts.email == req.media["email"]))
+                q1 = SQLAccounts.get_or_none((SQLAccounts.uid == req.media["uid"]) | (SQLAccounts.email == req.media["email"]))
             except Exception as e:
                 api_message('w', f'Failed to request database : {e}')
                 resp.status = falcon.HTTP_500
@@ -46,7 +46,7 @@ class Register(object):
                 keypair = gen_account_keypair()
                 datenow = datetime.datetime.utcnow()
                 try:
-                    Accounts.create(
+                    SQLAccounts.create(
                         uid=req.media['uid'],
                         firstname=req.media['firstname'],
                         lastname=req.media['lastname'],
