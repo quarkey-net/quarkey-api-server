@@ -1,5 +1,7 @@
 # QuarKEY-api-server
 
+![Quarkey logo](https://github.com/PowerSaucisse/quarkey-api-server/blob/main/assets/img/quarkey-full.png?raw=true)
+
 REST API Backend for QuarKEY Frontend
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/PowerSaucisse/Quarkey-api-server)
