@@ -6,7 +6,7 @@ WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'quarkey')\gexec
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE IF NOT EXISTS accounts (
-    uid         TEXT PRIMARY KEY NOT NULL UNIQUE,
+    id          TEXT PRIMARY KEY NOT NULL UNIQUE,
     firstname   TEXT NOT NULL,
     lastname    TEXT NOT NULL,
     email       TEXT NOT NULL UNIQUE,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS tags (
     color       TEXT DEFAULT NULL,
     CONSTRAINT fk_account
         FOREIGN KEY(f_owner)
-            REFERENCES accounts(uid)
+            REFERENCES accounts(id)
 );
 
 
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS linkers (
     f_tag       BIGINT DEFAULT NULL,
     CONSTRAINT fk_account
         FOREIGN KEY(f_owner)
-            REFERENCES accounts(uid),
+            REFERENCES accounts(id),
     CONSTRAINT fk_password
         FOREIGN KEY(f_item)
             REFERENCES passwords(id),
