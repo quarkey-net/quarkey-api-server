@@ -27,7 +27,3 @@ $ pip3 install -r requirements.txt  # win_requirements.txt for Windows
 # launch
 $ python launch.py
 ```
-
-## Developer Notes
-
-See developer documentaion here : <https://github.com/PowerSaucisse/QuarKEY-api-server/blob/dev/DEVELOPER.md>
