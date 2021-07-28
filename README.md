@@ -1,6 +1,6 @@
 # QuarKEY-api-server
 
-![Quarkey logo](https://github.com/PowerSaucisse/quarkey-api-server/blob/main/assets/img/quarkey-full.png?raw=true)
+![Quarkey logo](https://github.com/PowerSaucisse/quarkey-api-server/blob/main/assets/img/quarkey-full.png?raw=true) [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/PatReunPk5)
 
 REST API Backend for QuarKEY Frontend
 
