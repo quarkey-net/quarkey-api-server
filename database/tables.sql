@@ -16,19 +16,19 @@ CREATE TABLE IF NOT EXISTS tester_keys (
 
 
 CREATE TABLE IF NOT EXISTS accounts (
-    id              TEXT PRIMARY KEY NOT NULL UNIQUE,
-    f_tester_key    INT NOT NULL UNIQUE,
-    firstname       TEXT NOT NULL,
-    lastname        TEXT NOT NULL,
-    email           TEXT NOT NULL UNIQUE,
-    password        TEXT NOT NULL,
-    public_key      BYTEA NOT NULL,
-    private_key     BYTEA NOT NULL,
-    roles           TEXT NOT NULL,
-    -- ADD PLAN
-    is_banned       BOOLEAN NOT NULL DEFAULT FALSE,
-    updated_on      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_on      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id                  TEXT PRIMARY KEY NOT NULL UNIQUE,
+    f_tester_key        INT NOT NULL UNIQUE,
+    firstname           TEXT NOT NULL,
+    lastname            TEXT NOT NULL,
+    email               TEXT NOT NULL UNIQUE,
+    password            TEXT NOT NULL,
+    public_key          BYTEA NOT NULL,
+    private_key         BYTEA NOT NULL,
+    roles               TEXT NOT NULL,
+    subscription_exp    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_banned           BOOLEAN NOT NULL DEFAULT FALSE,
+    updated_on          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_on          TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_tester_key
         FOREIGN KEY(f_tester_key)
             REFERENCES tester_keys(id)
