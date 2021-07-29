@@ -1,7 +1,6 @@
 wheel
 jsonschema
 falcon
-peewee
 psycopg2
 argon2-cffi
 cryptography
