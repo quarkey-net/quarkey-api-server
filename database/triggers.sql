@@ -8,3 +8,8 @@ CREATE TRIGGER trgg_auto_update_accounts
 CREATE TRIGGER trgg_auto_update_passwords
     BEFORE UPDATE ON passwords FOR EACH ROW
     EXECUTE PROCEDURE func_update_tmstmp();
+
+
+CREATE TRIGGER trgg_auto_update_auth_token_rsa
+    BEFORE UPDATE ON passwords FOR EACH ROW
+    EXECUTE PROCEDURE func_update_tmstmp();
