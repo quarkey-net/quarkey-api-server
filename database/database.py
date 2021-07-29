@@ -1,34 +1,28 @@
-import peewee
+import psycopg2
+from utils.base import api_message
+from utils.config import AppState
 
-db = peewee.DatabaseProxy()
+class PGDatabase:
 
-""" 
-def get_database(file='./quark.json', deploy_mod="test"):
+    def __init__(self) -> None:
+        self._conn = None
 
-    with open(file, 'r') as desc:
-        conf = json.load(desc)[deploy_mod]["SGBD"]
-    
-    if conf.get("type") == "SQLITE":
-        db = peewee.SqliteDatabase(conf["options"]["file"])
-        db.connect()
-        print(f"[DATABASE] SUCCESS TO CONNECT TO SQLite Database")
-        return db
-    elif conf.get("type") == "MYSQL":
-        options = conf["options"]
-        db = peewee.MySQLDatabase(options["name"], host=options["host"], port=options["port"], user=options["user"], password=options["pass"], autocommit=True, autorollback=True)
-        db.connect()
-        print(f"[DATABASE] SUCCESS TO CONNECT TO MySQL Database")
-        return db
-    elif conf.get("type") == "POSTGRESQL":
-        options = conf["options"]
-        db = peewee.PostgresqlDatabase(options["name"], host=options["host"], port=options["port"], user=options["user"], password=options["pass"], autocommit=True, autorollback=True)
-        db.connect()
-        print(f"[DATABASE] SUCCESS TO CONNECT TO PostgreSQL Database")
-        return db
-    else:
-        print(f"[DATABASE] ERROR no supporting database")
-        exit(0)
-    
+    def connect(self):
+        if self._conn is None:
+            try:
+                self._conn = psycopg2.connect(
+                    host=AppState.Database.HOST,
+                    user=AppState.Database.USER,
+                    password=AppState.Database.PASS,
+                    port=AppState.Database.PORT,
+                    dbname=AppState.Database.NAME
+                )
+            except psycopg2.DatabaseError as e:
+                api_message("d", f'Failed to connect to PostgreSQL database, error : {e}')
+                raise e
+            finally:
+                api_message("d", f'Success to connect to PostgreSQL database')
+        return self._conn
 
-db = get_database()     
-"""
+db = PGDatabase()
+conn = db.connect()
