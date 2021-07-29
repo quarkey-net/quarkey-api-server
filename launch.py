@@ -2,10 +2,9 @@
 # Author    : Esteban Ristich <esteban.ristich@protonmail.com>
 # License   : MIT
 
-import platform, os, peewee, logging, falcon, argparse
+import platform, os, logging, falcon, argparse
 
-from database.database import db
-from database.models import SQLAccounts, SQLPasswords, SQLAuthToken
+from database.database import 
 
 from routes.register import Register
 from routes.login import Login
@@ -36,38 +35,14 @@ if AppState.LOGGING_LEVEL is not None:
     logging.basicConfig(filename=f'logs/{logfile}', filemode='w', level=AppState.LOGGING_LEVEL, format='%(name)s:%(levelname)s-%(asctime)s-%(message)s', datefmt="%d-%m-%Y %H:%M:%S")
 """ END SETUP LOGGING """
 
-try:
-    if AppState.Database.TYPE == "sqlite":
-        db.initialize(peewee.SqliteDatabase(
-            f'database/{AppState.TAG.upper()}.db', pragmas={
-            'journal_mode': 'wal',
-            'cache_size': -1024 * 64}
-        ))
-    else:
-        db.initialize(peewee.PostgresqlDatabase(
-            AppState.Database.NAME,
-            host=AppState.Database.HOST,
-            port=AppState.Database.PORT,
-            user=AppState.Database.USER,
-            password=AppState.Database.PASS,
-            autocommit=True,
-            autorollback=True
-        ))
-    db.connect()
-    print('[+] Success to connect to database')
-except Exception as e:
-    print(f'[-] Failed to connect to database, error : {e}')
-    exit(0)
-
 
 middlewares: list = []
 if AppState.TAG in ['dev', 'test']:
-    db.create_tables([SQLAccounts, SQLPasswords, SQLAuthToken], safe=True)
     middlewares.append(CORSMiddleware())
     middlewares.append(DebugMiddleware())
 
 middlewares.append(AcceptJSONMiddleware())
-middlewares.append(DatabaseConnectMiddleware())
+middlewares.append(DatabaseConnectMiddleware()) 
 
 
 if AppState.AccountToken.TYPE == 'RS256':
