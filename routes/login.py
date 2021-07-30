@@ -1,5 +1,4 @@
 import falcon, datetime
-from database.models import SQLAccounts
 from utils.base import api_message, api_validate_form
 from utils.security.auth import AccountAuthToken, UserPasswordHasher
 from utils.config import AppState
@@ -27,42 +26,39 @@ class Login(object):
         resp.status = falcon.HTTP_400
 
         if api_validate_form(req.media, self.get_form):
-            try:
-                q1 = SQLAccounts.select(
-                    SQLAccounts.uid,
-                    SQLAccounts.firstname,
-                    SQLAccounts.lastname,
-                    SQLAccounts.password,
-                    # peewee.fn.CONCAT(SQLAccounts.firstname, ' ', SQLAccounts.lastname).alias('fullname'),
-                    SQLAccounts.role,
-                    SQLAccounts.premium_expiration
-                ).where((SQLAccounts.is_banned == False) & (SQLAccounts.is_verified == True) & (SQLAccounts.uid == req.media['uid'])).limit(1).dicts()
-            except Exception as e:
-                api_message('w', f'Failed to request database to login account : {e}')
-                resp.status = falcon.HTTP_500
-                return
+            q1 = None
+            with AppState.Database.CONN.cursor() as cur:
+                cur.execute(
+                    "SELECT t1.id, CONCAT(t1.firstname, ' ', t1.lastname) AS fullname, t1.password, t1.roles, t1.subscription_exp, t2.id AS tester_key, t2.type AS tester_type, t2.expiration_on AS tester_expiration FROM accounts AS t1 INNER JOIN tester_keys AS t2 ON t1.f_tester_key = t2.id WHERE t1.is_banned = FALSE AND t1.id = %s AND t2.type = %s AND t2.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
+                    (
+                        req.media["uid"],
+                        AppState.TAG
+                    )
+                )
+                q1 = cur.fetchone()
 
-            if not q1:
+            if q1 is None or not q1:
                 resp.status = falcon.HTTP_BAD_REQUEST
                 resp.media  = {'title': 'BAD_REQUEST', 'description': 'username or password not found'}
                 return
 
-            roles: list = q1[0]['role'].split(':')
-            fullname: str = "{0} {1}".format(q1[0]['firstname'], q1[0]['lastname'])
+            fullname: str = q1[1]
+            password: str =q1[2]
+            roles: list = q1[3].split(':')
+            subscription_exp = q1[4]
 
-
-            if self.password_hasher.verify_password(q1[0]['password'], req.media['password']):
-                if q1[0]['premium_expiration'] > datetime.datetime.utcnow():
+            if self.password_hasher.verify_password(password, req.media['password']):
+                if subscription_exp.replace(tzinfo=None) > datetime.datetime.utcnow():
                     roles.append('premium')
 
                 api_message('d', f'pub type {type(AppState.AccountToken.PUBLIC)}')
                 token = self.token_controller.create(
                     duration=3000,
-                    uid=q1[0]['uid'],
+                    uid=q1[0],
                     roles=roles,
                     fullname=fullname
                 )
-                api_message('i', "success login (uid={0} fullname={1})".format("'"+q1[0]['uid']+"'", "'"+fullname+"'"))
+                api_message('i', "success login (user_id={0} fullname={1})".format(q1[0], fullname))
                 resp.status = falcon.HTTP_OK
                 resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'token': token}}
                 return
