@@ -7,8 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
 CREATE TABLE IF NOT EXISTS tester_keys (
-    id              SERIAL PRIMARY KEY NOT NULL UNIQUE,
-    key             TEXT NOT NULL UNIQUE,
+    id              VARCHAR(20) PRIMARY KEY NOT NULL UNIQUE,
     type            TEXT NOT NULL,
     expiration_on   TIMESTAMPTZ DEFAULT NULL,
     created_on      TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -17,7 +16,7 @@ CREATE TABLE IF NOT EXISTS tester_keys (
 
 CREATE TABLE IF NOT EXISTS accounts (
     id                  TEXT PRIMARY KEY NOT NULL UNIQUE,
-    f_tester_key        INT NOT NULL UNIQUE,
+    f_tester_key        VARCHAR(20) NOT NULL UNIQUE,
     firstname           TEXT NOT NULL,
     lastname            TEXT NOT NULL,
     email               TEXT NOT NULL UNIQUE,
