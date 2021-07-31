@@ -3,7 +3,7 @@ from utils.config import AppState
 from utils.security.auth import AccountAuthToken
 import falcon
 from utils.base import api_message
-from database.database import db
+# from database.database import db
 
 class DebugMiddleware(object):
 
@@ -43,7 +43,7 @@ class CORSMiddleware(object):
         api_message('WARNING', f'{resp.headers}')
 """
 
-
+"""
 class DatabaseConnectMiddleware():
     
     def process_resource(self, req, resp, resource, params):
@@ -54,7 +54,7 @@ class DatabaseConnectMiddleware():
     def process_response(self, req, resp, resource, req_succeeded):
         if not db.is_closed():
             db.close()
-
+"""
 
 class AuthorizeAccount:
     def __init__(self, roles: list):
