@@ -23,6 +23,3 @@ class PGDatabase:
             finally:
                 api_message("d", f'Success to connect to PostgreSQL database')
         return self._conn
-
-db = PGDatabase()
-conn = db.connect()
