@@ -47,8 +47,9 @@ class AppState:
 
     class Database:
         """ Describe SQL Database Credentials """
+        CONN = None
         TYPE: str = "postgres"
-        NAME: str = os.environ.get("DB_NAME", "quarkey")
+        NAME: str = os.environ.get("DB_NAME", "tests")
         HOST: str = os.environ.get("DB_HOST", "127.0.0.1")
         PORT: int = int(os.environ.get("DB_PORT", 5432))
         USER: str = os.environ.get("DB_USER", "postgres")
