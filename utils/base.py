@@ -1,8 +1,6 @@
 from __future__ import print_function
 import datetime, peewee, falcon, jsonschema, sys, logging, os
 from utils.config import AppState
-from database.models import SQLAuthToken
-from database.database import db
 
 # EMAIL = yagmail.SMTP(API_DEV_EMAIL_EXPEDITOR, API_DEV_EMAIL_PASSWORD)
 
@@ -77,28 +75,21 @@ def get_rsa_keypair(token_type: str = None) -> list:
     - KEYPAIR[0] -> public key
     - KEYPAIR[1] -> private key
     """
-    if db.is_closed():
-        db.connect()
+    result = None
+    with AppState.Database.CONN.cursor() as cur:
+        cur.execute("SELECT public_key, private_key FROM auth_token_rsa WHERE type = %s", (token_type,))
+        result = cur.fetchone()
+    AppState.Database.CONN.commit()
+    print(f'pubkey : {result[0]}')
     try:
-        q = SQLAuthToken.select(SQLAuthToken.public_key, SQLAuthToken.private_key).where(SQLAuthToken.token_type == token_type).dicts()
-    except peewee.DatabaseError as e:
-        print(f'[ ERROR ] - Database error, failed to make request : {e}')
-        exit(0)
-    except Exception as e:
-        print(f'[ ERROR ] - No rsa jwt keys available in database : {e}')
-        exit(0)
-
-    try:
-        return [q[0]["public_key"], q[0]["private_key"]]
+        return [result[0], result[1]]
         """         
         RSAKEYS.insert(0, str(q[0]["public_key"]))
         RSAKEYS.insert(1, str(q[0]["private_key"]))
         """
-    except IndexError as e:
+    except Exception as e:
         print(f'[ ERROR ] - No rsa jwt key available in database : {e}, in file {__file__}')
-    
-    if not db.is_closed():
-        db.close()
+
 
 
 
