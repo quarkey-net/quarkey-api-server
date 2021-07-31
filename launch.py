@@ -3,14 +3,15 @@
 # License   : MIT
 
 import platform, os, logging, falcon, argparse
-
-from database.database import 
-
+from database.database import PGDatabase
 from routes.register import Register
+
 from routes.login import Login
+
 from routes.password_item import PasswordItem
+
 # from routes.verify_account import VerifyAccount
-from routes.middleware import AcceptJSONMiddleware, CORSMiddleware, DatabaseConnectMiddleware, DebugMiddleware
+from routes.middleware import AcceptJSONMiddleware, CORSMiddleware, DebugMiddleware
 
 from utils.config import AppState
 from utils.base import get_rsa_keypair
@@ -35,6 +36,8 @@ if AppState.LOGGING_LEVEL is not None:
     logging.basicConfig(filename=f'logs/{logfile}', filemode='w', level=AppState.LOGGING_LEVEL, format='%(name)s:%(levelname)s-%(asctime)s-%(message)s', datefmt="%d-%m-%Y %H:%M:%S")
 """ END SETUP LOGGING """
 
+db = PGDatabase()
+AppState.Database.CONN = db.connect()
 
 middlewares: list = []
 if AppState.TAG in ['dev', 'test']:
@@ -42,7 +45,7 @@ if AppState.TAG in ['dev', 'test']:
     middlewares.append(DebugMiddleware())
 
 middlewares.append(AcceptJSONMiddleware())
-middlewares.append(DatabaseConnectMiddleware()) 
+# middlewares.append(DatabaseConnectMiddleware()) 
 
 
 if AppState.AccountToken.TYPE == 'RS256':
@@ -53,17 +56,23 @@ if AppState.AccountToken.TYPE == 'RS256':
 api = application = falcon.App(middleware=middlewares)
 
 reg = Register()
+
 log = Login()
+
 pass_itm = PasswordItem()
+
 """ ver_acc = VerifyAccount() """
 
 API_PREFIX = f'/api/v{AppState.VERSION[0]}'
 
 api.add_route(f'{API_PREFIX}/register', reg)
+
 api.add_route(f'{API_PREFIX}/login', log)
+
 api.add_route("{}/user/password_item".format(
     API_PREFIX
 ), pass_itm)
+
 """
 api.add_route("{}/user/{}/verify_account".format(
     API_PREFIX,
