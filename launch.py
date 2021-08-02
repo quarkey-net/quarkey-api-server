@@ -7,7 +7,9 @@ from database.database import PGDatabase
 from routes.register import Register
 
 from routes.login import Login
-
+from routes.process_tag import ProcessTag
+from routes.process_link_tag import ProcessLinkTag
+from routes.process_tester_key import ProcessTesterKey
 from routes.password_item import PasswordItem
 
 # from routes.verify_account import VerifyAccount
@@ -56,9 +58,7 @@ if AppState.AccountToken.TYPE == 'RS256':
 api = application = falcon.App(middleware=middlewares)
 
 reg = Register()
-
 log = Login()
-
 pass_itm = PasswordItem()
 
 """ ver_acc = VerifyAccount() """
@@ -69,9 +69,13 @@ api.add_route(f'{API_PREFIX}/register', reg)
 
 api.add_route(f'{API_PREFIX}/login', log)
 
-api.add_route("{}/user/password_item".format(
+api.add_route("{}/account/password_item".format(
     API_PREFIX
 ), pass_itm)
+api.add_route(f'{API_PREFIX}/account/tester/key', ProcessTesterKey())
+api.add_route(f'{API_PREFIX}/account/tag', ProcessTag())
+api.add_route(f'{API_PREFIX}/account/link/tag', ProcessLinkTag())
+
 
 """
 api.add_route("{}/user/{}/verify_account".format(
