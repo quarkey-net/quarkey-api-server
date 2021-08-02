@@ -143,3 +143,4 @@ debug.txt
 cheatsheet.sql
 gen_simulation.sql
 gen_token_keypair.py
+database/linker.sql
