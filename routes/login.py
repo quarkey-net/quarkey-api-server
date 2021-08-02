@@ -53,7 +53,7 @@ class Login(object):
 
                 api_message('d', f'pub type {type(AppState.AccountToken.PUBLIC)}')
                 token = self.token_controller.create(
-                    duration=3000,
+                    duration=10000,
                     uid=q1[0],
                     roles=roles,
                     fullname=fullname
