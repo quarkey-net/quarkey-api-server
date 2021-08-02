@@ -19,7 +19,7 @@ class PGDatabase:
                 )
             except psycopg2.DatabaseError as e:
                 api_message("d", f'Failed to connect to PostgreSQL database, error : {e}')
-                raise e
-            finally:
-                api_message("d", f'Success to connect to PostgreSQL database')
+                exit(0)
+
+        api_message("d", f'Success to connect to PostgreSQL database')
         return self._conn
