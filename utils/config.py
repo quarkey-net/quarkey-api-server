@@ -29,7 +29,7 @@ class AppState:
 
     # If is None -> logging level deactivate
     LOGGING_LEVEL   = LOG_LEVEL["debug"]
-    LOGGING_ENABLE: bool  = True
+    LOGGING_ENABLE: bool  = False
     STDERR_ENABLE: bool   = True
     STDOUT_ENABLE: bool   = True
 

@@ -29,7 +29,7 @@ print(f'[+] App version : v{".".join(map(str, AppState.VERSION))}-{AppState.TAG}
 print(f'[+] App socket : {AppState.HOST}:{AppState.PORT}')
 
 """ SETUP LOGGING """
-if AppState.LOGGING_LEVEL is not None:
+if AppState.LOGGING_ENABLE:
     try: 
         os.mkdir('logs')
     except FileExistsError: 

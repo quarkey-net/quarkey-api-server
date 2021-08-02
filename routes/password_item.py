@@ -30,7 +30,7 @@ class PasswordItem(object):
             payload = self._token_controller.decode(req.get_header('Authorization'))
             q1 = None
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute("SELECT id FROM passwords WHERE f_owner = %s AND title = %s", (payload['uid'], req.media['title']))
+                cur.execute("SELECT id FROM passwords WHERE f_owner = %s AND name = %s", (payload['uid'], req.media['title']))
                 q1 = cur.fetchone()
 
             if q1 is not None:
@@ -39,9 +39,10 @@ class PasswordItem(object):
                 return                
 
             puuid = uuid.uuid4().hex
+            tag_id = uuid.uuid4().hex
             with AppState.Database.CONN.cursor() as cur:
                 cur.execute(
-                    "INSERT INTO passwords (id, f_owner, name, description, username, password, url) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
+                    "INSERT INTO passwords (id, f_owner, name, description, login, password_1, url) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
                     (
                         puuid,
                         payload['uid'],
@@ -52,7 +53,8 @@ class PasswordItem(object):
                         req.media['url']
                     )
                 )
-                cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (puuid, None))
+                cur.execute("INSERT INTO tags (id, f_owner, name, color) VALUES (%s, %s, %s, %s)", (tag_id, payload["uid"], "global", "white"))
+                cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (puuid, tag_id))
                 AppState.Database.CONN.commit()
 
             
@@ -65,13 +67,19 @@ class PasswordItem(object):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
         q1 = None
+        q2 = None
         columns = None
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("SELECT t2.name, t2.description, t2.login, t2.password, t2.url, t4.name AS tag_name, t4.color AS tag_color FROM password_tag_linkers AS t1 INNER JOIN passwords AS t2 ON t1.f_password = t2.id INNER JOIN accounts AS t3 ON t2.f_owner = t3.id LEFT JOIN tags AS t4 ON t1.f_tag = t4.id WHERE t3.id = %s AND t3.is_banned = FALSE", (payload['uid'],))
+            cur.execute("SELECT t2.id, t2.type, t2.name, t2.description, t2.login, t2.url, t2.password_1 FROM passwords AS t2 INNER JOIN accounts AS t3 ON t2.f_owner = t3.id WHERE t3.id = %s AND t3.is_banned = FALSE", (payload['uid'],))
             columns = list(cur.description)
             q1 = cur.fetchall()
 
-        if q1 is None:
+        with AppState.Database.CONN.cursor() as cur:
+            cur.execute("SELECT t1.f_password AS password_id, t2.name AS tag_name, t2.color AS tag_color FROM password_tag_linkers AS t1 INNER JOIN tags AS t2 ON t1.f_tag = t2.id WHERE t2.f_owner = %s", (payload["uid"],))
+            q2 = cur.fetchall()
+
+
+        if q1 is None or q2 is None:
             resp.media = {"title": "BAD_REQUEST", "description": "failed to get password items"}
             return
         elif len(q1) < 1:
@@ -80,12 +88,49 @@ class PasswordItem(object):
         
         print(q1)
 
+        pass_template = {
+            "id": None,
+            "type": None,
+            "name": None,
+            "description": None,
+            "login": None,
+            "passwords": [],
+            "url": None,
+            "tags": []
+        }
+        tag_template = {
+            "name": None, 
+            "color": None
+        }
+
+        results = []
+        for x in q1:
+            pass_itm = pass_template.copy()
+            pass_itm["id"]          = x[0].hex
+            pass_itm["type"]        = x[1]
+            pass_itm["name"]        = x[2]
+            pass_itm["description"] = x[3]
+            pass_itm["login"]       = x[4]
+            pass_itm["passwords"].append(x[6])
+            pass_itm["url"]         = x[5]
+            for y in q2:
+                print(f'q1 : {x[0]}, q2 : {y[0]}')
+                if x[0] == y[0]:
+                    print('work')
+                    tag_itm = tag_template.copy()
+                    tag_itm["name"]     = y[1]
+                    tag_itm["color"]    = y[2]
+                    pass_itm["tags"].append(tag_itm)
+            results.append(pass_itm)
+
+        """
         results: list = []
         for row in q1:
             row_dict: dict = {}
             for i, col in enumerate(columns):
                 row_dict[col.name] = row[i]
         results.append(row_dict)
+        """
 
         resp.status = falcon.HTTP_OK
         resp.media  = {"title": "OK", "description": "password list getted successful", "content": results}

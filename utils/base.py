@@ -1,5 +1,5 @@
 from __future__ import print_function
-import datetime, peewee, falcon, jsonschema, sys, logging, os
+import datetime, peewee, falcon, jsonschema, sys, logging, os, random
 from utils.config import AppState
 
 # EMAIL = yagmail.SMTP(API_DEV_EMAIL_EXPEDITOR, API_DEV_EMAIL_PASSWORD)
@@ -124,3 +124,13 @@ def read_file(file_path : str, block_size: int = 1024, mode: str = 'rb') -> byte
                     return
     else:
         raise FileNotFoundError
+
+
+def gen_random_test_key() -> str:
+    """ Generate 20 characters hexadecimal for tester key """
+    chain: str = "0123456789ABCDEF"
+    key: list = []
+    for x in range(1, 21):
+        idx = random.randint(0, len(chain) - 1)
+        key.append(chain[idx])
+    return "".join(key)
