@@ -16,22 +16,25 @@ class Login(object):
             "$schema": AppState.Tools.JSONSCHEMA_VERSION,
             "type": "object",
             "properties": {
-                "uid"       : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
+                "username"  : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
+                "email"     : {"type": "string", "format": "email", "pattern": "^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"},
                 "password"  : {"type": "string", "pattern": "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,60}$"}
             },
-            "required": ["uid", "password"]
+            "required": ["password"]
         }
 
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_400
-
         if api_validate_form(req.media, self.get_form):
             q1 = None
+            email       = req.media.get("email", None)
+            username    = req.media.get("username", None)
             with AppState.Database.CONN.cursor() as cur:
                 cur.execute(
-                    "SELECT t1.id, CONCAT(t1.firstname, ' ', t1.lastname) AS fullname, t1.password, t1.roles, t1.subscription_exp, t2.id AS tester_key, t2.type AS tester_type, t2.expiration_on AS tester_expiration FROM accounts AS t1 INNER JOIN tester_keys AS t2 ON t1.f_tester_key = t2.id WHERE t1.is_banned = FALSE AND t1.id = %s AND t2.type = %s AND t2.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
+                    "SELECT t1.id, CONCAT(t1.firstname, ' ', t1.lastname) AS fullname, t1.password, t1.roles, t1.subscription_exp, t2.id AS tester_key, t2.type AS tester_type, t2.expiration_on AS tester_expiration FROM accounts AS t1 INNER JOIN tester_keys AS t2 ON t1.f_tester_key = t2.id WHERE (t1.id = %s OR t1.email = %s) AND t1.is_banned = FALSE AND t2.type = %s AND t2.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
                     (
-                        req.media["uid"],
+                        username,
+                        email,
                         AppState.TAG
                     )
                 )
@@ -53,7 +56,7 @@ class Login(object):
 
                 api_message('d', f'pub type {type(AppState.AccountToken.PUBLIC)}')
                 token = self.token_controller.create(
-                    duration=10000,
+                    duration=10000000,
                     uid=q1[0],
                     roles=roles,
                     fullname=fullname
