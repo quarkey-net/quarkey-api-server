@@ -62,20 +62,23 @@ class PasswordItem(object):
         resp.media  = {"title": "CREATED", "description": "resource created successful"}
 
 
+
     @falcon.before(AuthorizeAccount(roles=["standard"]))
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
         q1 = None
         q2 = None
-        columns = None
+        password_columns = None
+        tag_columns = None
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("SELECT t2.id, t2.type, t2.name, t2.description, t2.login, t2.url, t2.password_1 FROM passwords AS t2 INNER JOIN accounts AS t3 ON t2.f_owner = t3.id WHERE t3.id = %s AND t3.is_banned = FALSE", (payload['uid'],))
-            columns = list(cur.description)
+            cur.execute("SELECT t2.id, t2.type, t2.name, t2.description, t2.login, t2.url, t2.password_1, t2.password_2 FROM passwords AS t2 INNER JOIN accounts AS t3 ON t2.f_owner = t3.id WHERE t3.id = %s AND t3.is_banned = FALSE", (payload['uid'],))
+            # password_columns = list(cur.description)
             q1 = cur.fetchall()
 
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("SELECT t1.f_password AS password_id, t2.name AS tag_name, t2.color AS tag_color FROM password_tag_linkers AS t1 INNER JOIN tags AS t2 ON t1.f_tag = t2.id WHERE t2.f_owner = %s", (payload["uid"],))
+            cur.execute("SELECT t1.f_password AS password_id, t2.id AS tag_id, t2.name AS tag_name, t2.color AS tag_color FROM password_tag_linkers AS t1 INNER JOIN tags AS t2 ON t1.f_tag = t2.id WHERE t2.f_owner = %s", (payload["uid"],))
+            # tag_columns = list(cur.description)
             q2 = cur.fetchall()
 
 
@@ -86,51 +89,52 @@ class PasswordItem(object):
             resp.media = {"title": "BAD_REQUEST", "description": "empty password items"}
             return
         
+        results: list = [] 
         print(q1)
-
-        pass_template = {
-            "id": None,
-            "type": None,
-            "name": None,
-            "description": None,
-            "login": None,
-            "passwords": [],
-            "url": None,
-            "tags": []
-        }
-        tag_template = {
-            "name": None, 
-            "color": None
-        }
-
-        results = []
         for x in q1:
-            pass_itm = pass_template.copy()
-            pass_itm["id"]          = x[0].hex
-            pass_itm["type"]        = x[1]
-            pass_itm["name"]        = x[2]
+            pass_itm: dict = {}
+            pass_itm["id"]      = x[0].hex
+            pass_itm["type"]    = x[1]
+            pass_itm["name"]    = x[2]
             pass_itm["description"] = x[3]
             pass_itm["login"]       = x[4]
-            pass_itm["passwords"].append(x[6])
+            pass_itm["password"] = []
+            pass_itm["password"].append(x[6])
+            pass_itm["password"].append(x[7])
             pass_itm["url"]         = x[5]
+            pass_itm["tags"]        = []
             for y in q2:
-                print(f'q1 : {x[0]}, q2 : {y[0]}')
-                if x[0] == y[0]:
-                    print('work')
-                    tag_itm = tag_template.copy()
-                    tag_itm["name"]     = y[1]
-                    tag_itm["color"]    = y[2]
+                if x[0].hex == y[0].hex:
+                    tag_itm: dict = {}
+                    tag_itm["id"] = y[1].hex
+                    tag_itm["name"] = y[2]
+                    tag_itm["color"] = y[3]
                     pass_itm["tags"].append(tag_itm)
             results.append(pass_itm)
 
-        """
-        results: list = []
-        for row in q1:
-            row_dict: dict = {}
-            for i, col in enumerate(columns):
-                row_dict[col.name] = row[i]
-        results.append(row_dict)
-        """
-
         resp.status = falcon.HTTP_OK
         resp.media  = {"title": "OK", "description": "password list getted successful", "content": results}
+        return
+
+
+
+    @falcon.before(AuthorizeAccount(roles=["standard"]))
+    def on_delete(self, req, resp):
+        resp.status = falcon.HTTP_400
+        payload = self._token_controller.decode(req.get_header('Authorization'))
+        password_id = req.get_param("password_id")
+        tag_global_id = None
+        with AppState.Database.CONN.cursor() as cur:
+            cur.execute("SELECT t2.id FROM password_tag_linkers AS t1 INNER JOIN tags AS t2 ON t1.f_tag = t2.id WHERE t1.f_password = %s AND t2.f_owner = %s AND t2.name = 'global'", (password_id, payload["uid"]))
+            tag_global_id = cur.fetchone()[0].hex
+
+        if tag_global_id is None:
+            return
+
+        with AppState.Database.CONN.cursor() as cur:
+            cur.execute("DELETE FROM password_tag_linkers AS t1 USING passwords AS t2 WHERE t1.f_password = %s AND t2.id = %s AND t2.f_owner = %s", (password_id, password_id, payload["uid"]))
+            cur.execute("DELETE FROM tags AS t1 WHERE id = %s", (tag_global_id,))
+            cur.execute("DELETE FROM passwords WHERE id = %s AND f_owner = %s", (password_id, payload["uid"]))
+            AppState.Database.CONN.commit()
+        
+        resp.status = falcon.HTTP_200
