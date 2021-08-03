@@ -4,9 +4,9 @@
 
 ## Introduction
 
-Une api "RESTful" pour le gestionnaire de mot de passe Quarkey
+_"Une api "RESTful" pour le gestionnaire de mot de passe Quarkey
 et son application Web faite en VueJS. Elle supportera à terme
-dans sa version stable le chiffrement expérimental quantique.
+dans sa version stable le chiffrement expérimental quantique"_
 
 > Si vous souhaitez utiliser l'API en version de développement 
 > publique vous devrez alors demander une clé de développement 

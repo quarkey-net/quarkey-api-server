@@ -1,26 +1,36 @@
 # DEVELOPER NOTES
 
-## API PRIVATE DOCUMMENTATION
+## API DOCUMENTATION
 
-L'api est actuellement en version de dévelopement, il n'existe donc pas actuellement
-de nom de domaine attribué au service. Or l'api à terme utilisera le nom de domaine
-de **ColdWire**.
+Il n'existe pas actuellement de nom de domaine attribué au service. 
+Cependant une version **Heroku** est hébergé afin d'effectuer des 
+tests et audits de sécurité. Si vous souhaitez contribuer, vous
+pouvez demander des clés à l'une des adresses suivantes :
+  - esteban.ristich@protonmail.com
+  - regis.brasme@gmail.com
 
-> L'API supporte actuellement seulement **JSON** ('Content-Type: application/json').
-> Elle pourra propablement integrer **MsgPack** dans ses futures versions.
+> L'API supporte actuellement seulement **JSON**. Veuillez 
+> donc définir dans votre header la clé et la valeur suivante 
+> **'Content-Type': 'application/json'** ainsi que votre token 
+> **'Authorization': 'YOUR_TOKEN'**. Ce dernier vous sera utile
+> pour acceder à toutes les resources, excepter : 
+> - ```http://quarkey.herokuapp.com/api/auth/register```
+> - ```http://quarkey.codewire.co/api/auth/login```
 
-### REGISTER
+### CREATE AN ACCOUNT
 
 - Method : ```POST```
-- Request : ```http://quarkey.codewire.co/api/v1/register```
-- Parameter : **none**
+- Request : ```http://quarkey.herokuapp.com/api/auth/register```
 - Body :
 
 >    ```json
 >    {
->        "username": "Esteban",
->        "email": "esteban.ristich@protonmail.com",
->        "password": "motdepasse#38"
+>        "username" : "esteban",
+>        "firstname": "Esteban",
+>        "lastname" : "Ristich",
+>        "email"    : "esteban.ristich@protonmail.com",
+>        "password" : "motdepasse#38",
+>        "key"      : "B14FDA9A9D9363FA4E8F" # past your tester key
 >    }
 >    ```
 
@@ -28,22 +38,25 @@ de **ColdWire**.
 
 >    ```json
 >    {
->        "title": "REGISTER_SUCCESS",
->        "description": "Register successful! Please verify your email address",
+>        "title": "CREATED",
+>        "description": "Register successful!",
 >    }
 >    ```
 
-### LOGIN
+### LOGIN TO AN ACCOUNT
+
+For security and caching reasons, login requests are made 
+via the POST method.
 
 - Method : ```POST```
-- Request : ```http://quarkey.codewire.co/api/v1/login```
-- Parameter : **none**
+- Request : ```http://quarkey.codewire.co/api/auth/login```
 - Body :
 
 >    ```json
 >    {
->        "username": "Esteban",
+>        "username": "esteban",
 >        "password": "motdepasse#38"
+>        // You can also use "email" json key instead of "username" to login with your email adress
 >    }
 >    ```
 
@@ -51,11 +64,16 @@ de **ColdWire**.
 
 >    ```json
 >    {
->        "title": "LOGIN_SUCCESS",
->        "description": "Login successful!",
->        "token": "Bearer YOUR_TOKEN"
+>        "title": "OK",
+>        "description": "login success",
+>        "content": {"token": "Bearer YOUR_TOKEN"}
 >    }
 >    ```
+
+### CREATE PASSWORD ITEM
+
+- Method : ```POST```
+- Request : ```http://quarkey.codewire/api/account/item/password```
 
 ### GET PASSWORD ITEMS
 
