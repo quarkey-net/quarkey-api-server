@@ -1,8 +1,8 @@
-# QuarKEY-api-server
+# REST API Backend for QuarKEY Frontend
 
 ![Quarkey logo](https://github.com/PowerSaucisse/quarkey-api-server/blob/main/assets/img/quarkey-full.png?raw=true) [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/PowerSaucisse/Quarkey-api-server) [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/PatReunPk5)
 
-REST API Backend for QuarKEY Frontend
+## Introduction
 
 Une api "RESTful" pour le gestionnaire de mot de passe Quarkey
 et son application Web faite en VueJS. Elle supportera à terme
