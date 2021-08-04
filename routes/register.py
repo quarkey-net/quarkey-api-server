@@ -6,24 +6,19 @@ from utils.base import api_validate_form, api_message
 class Register(object):
 
     def __init__(self):
-        """
-        self.username_regex     = "^(?=[a-zA-Z0-9._]{4,15}$)(?!.*[_.]{2})[^_.].*[^_.]$"
-        self.email_regex        = "^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"
-        self.password_regex     = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,60}$"
-        """
         self.password_hasher    = UserPasswordHasher()
         self.post_form          = {
             "$schema": AppState.Tools.JSONSCHEMA_VERSION,
             "type": "object",
             "properties": {
-                "id"       : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{4,15}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
-                "firstname" : {"type": "string"},
-                "lastname"  : {"type": "string"},
-                "email"     : {"type": "string", "format": "email"},
-                "password"  : {"type": "string", "pattern": "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,60}$"},
-                "key"       : {"type": "string"}
+                "username"  : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,24}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
+                "firstname" : {"type": "string", "minLength": 2, "maxLength": 20},
+                "lastname"  : {"type": "string", "minLength": 2, "maxLength": 20},
+                "email"     : {"type": "string", "format": "email", "pattern": "^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"},
+                "password"  : {"type": "string", "pattern": "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,128}$"},
+                "key"       : {"type": "string", "minLength": 20, "maxLength": 20}
             },
-            "required": ["id", "firstname", "lastname", "email", "password", "key"]
+            "required": ["username", "firstname", "lastname", "email", "password", "key"]
         }
 
 
@@ -50,7 +45,7 @@ class Register(object):
             print(f'key id : {key_id}')
 
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute("SELECT * FROM accounts WHERE id = %s OR email = %s", (req.media['id'], req.media["email"]))
+                cur.execute("SELECT * FROM accounts WHERE id = %s OR email = %s", (req.media['username'], req.media["email"]))
                 q2 = cur.fetchone()
 
             if q2 is None:
@@ -61,7 +56,7 @@ class Register(object):
                     cur.execute(
                         "INSERT INTO accounts (id, firstname, lastname, email, password, public_key, private_key, roles, f_tester_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
                         (
-                            req.media['id'],
+                            req.media['username'],
                             req.media['firstname'],
                             req.media['lastname'],
                             req.media['email'],
@@ -75,7 +70,7 @@ class Register(object):
                 AppState.Database.CONN.commit()
             
         
-                api_message('d', "successfull register (user=\"{0}\", uid={1})".format(req.media['firstname'] + ' ' + req.media['lastname'], req.media['id']))
+                api_message('d', "successfull register (user=\"{0}\", uid={1})".format(req.media['firstname'] + ' ' + req.media['lastname'], req.media['username']))
                 resp.status = falcon.HTTP_201
                 resp.media = {'title': 'CREATED', 'description': 'accounts created successfull'}
                 return
