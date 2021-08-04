@@ -16,14 +16,14 @@ class Login(object):
             "$schema": AppState.Tools.JSONSCHEMA_VERSION,
             "type": "object",
             "properties": {
-                "username"  : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
+                "username"  : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,24}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
                 "email"     : {"type": "string", "format": "email", "pattern": "^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"},
                 "password"  : {"type": "string", "pattern": "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,60}$"}
             },
             "required": ["password"]
         }
 
-    def on_get(self, req, resp):
+    def on_post(self, req, resp):
         resp.status = falcon.HTTP_400
         if api_validate_form(req.media, self.get_form):
             q1 = None
@@ -63,7 +63,7 @@ class Login(object):
                 )
                 api_message('i', "success login (user_id={0} fullname={1})".format(q1[0], fullname))
                 resp.status = falcon.HTTP_OK
-                resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'token': token}}
+                resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'username': q1[0], 'fullname': fullname, 'roles': roles, 'token': token}}
                 return
             else:
                 resp.status = falcon.HTTP_BAD_REQUEST
