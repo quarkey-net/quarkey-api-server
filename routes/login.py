@@ -51,7 +51,7 @@ class Login(object):
             subscription_exp = q1[4]
 
             if self.password_hasher.verify_password(password, req.media['password']):
-                if subscription_exp.replace(tzinfo=None) > datetime.datetime.utcnow():
+                if subscription_exp > datetime.datetime.utcnow():
                     roles.append('premium')
 
                 api_message('d', f'pub type {type(AppState.AccountToken.PUBLIC)}')
