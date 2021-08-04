@@ -63,26 +63,12 @@ pass_itm = PasswordItem()
 
 """ ver_acc = VerifyAccount() """
 
-API_PREFIX = f'/api/v{AppState.VERSION[0]}'
-
-api.add_route(f'{API_PREFIX}/register', reg)
-
-api.add_route(f'{API_PREFIX}/login', log)
-
-api.add_route("{}/account/password_item".format(
-    API_PREFIX
-), pass_itm)
-api.add_route(f'{API_PREFIX}/account/tester/key', ProcessTesterKey())
-api.add_route(f'{API_PREFIX}/account/tag', ProcessTag())
-api.add_route(f'{API_PREFIX}/account/link/tag', ProcessLinkTag())
-
-
-"""
-api.add_route("{}/user/{}/verify_account".format(
-    API_PREFIX,
-    "{uid:uuid}"
-), ver_acc) 
-"""
+api.add_route("/api/auth/register", reg)
+api.add_route("/api/auth/login", log)
+api.add_route("/api/account/item/password", pass_itm)
+api.add_route("/api/account/tester/key", ProcessTesterKey())
+api.add_route("/api/account/item/tag", ProcessTag())
+api.add_route("/api/account/item/password/link/to/tag", ProcessLinkTag())
 
 
 if platform.system() == "Linux":
