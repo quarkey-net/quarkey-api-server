@@ -19,56 +19,54 @@ pouvez demander des clés à l'une des adresses suivantes :
 
 ### CREATE AN ACCOUNT
 
+
+
 - Method : ```POST```
 - Request : ```http://quarkey.herokuapp.com/api/auth/register```
+- Parameter :
+  - username  : _Username take minimum 3 characters and 24 max with numbers but no special characters execpt underscore_
+  - firstname : _Firstname take minimum 2 characters and 20 max_
+  - lastname  : _Lastname take minimum 2 characters and 20 max_
+  - email     : _Take email format_
+  - password  : _Password must have at least one capital letter and one special character and one number. He must have also 8 minimum characters_
+  - key       : _20 characters key_
 - Body :
 
->    ```json
->    {
->        "username" : "esteban",
->        "firstname": "Esteban",
->        "lastname" : "Ristich",
->        "email"    : "esteban.ristich@protonmail.com",
->        "password" : "motdepasse#38",
->        "key"      : "B14FDA9A9D9363FA4E8F" # past your tester key
->    }
->    ```
-
-- Return :
-
->    ```json
->    {
->        "title": "CREATED",
->        "description": "Register successful!",
->    }
->    ```
+  ```json
+      {
+          "username" : "esteban",
+          "firstname": "Esteban",
+          "lastname" : "Ristich",
+          "email"    : "esteban.ristich@protonmail.com",
+          "password" : "Motdepasse#38",
+          "key"      : "<TESTER KEY>" # past your tester key
+      }
+  ```
 
 ### LOGIN TO AN ACCOUNT
 
-_For security and caching reasons, login requests are made 
-via the POST method._
+_For security and caching reasons, login requests are made via the POST method._
 
 - Method : ```POST```
 - Request : ```http://quarkey.codewire.co/api/auth/login```
 - Body :
 
->    ```json
->    {
->        "username": "esteban",
->        "password": "motdepasse#38"
->        // You can also use "email" json key instead of "username" to login with your email adress
->    }
->    ```
+  ```json
+  {
+    "username": "esteban",
+    "password": "Motdepasse#38"
+  }
+  ```
 
 - Return :
 
->    ```json
->    {
->        "title": "OK",
->        "description": "success to login",
->        "content": {"token": "Bearer YOUR_TOKEN"}
->    }
->    ```
+  ```json
+  {
+    "title": "OK",
+    "description": "success to login",
+    "content": {"token": "<YOUR_TOKEN>"}
+  }
+  ```
 
 ### CREATE PASSWORD ITEM
 
@@ -76,24 +74,15 @@ via the POST method._
 - Request : ```http://quarkey.codewire/api/account/item/password```
 - Body :
 
->    ```json
->    {
->        "name"       : "Digital Ocean",
->        "description": "smart cloud platform",
->        "login"      : "random.user@gmail.com",
->        "url"        : "https://cloud.digitalocean.com/login",
->        "password"   : "motdepasse#38"
->    }
->    ```
-
-- Return :
-
->    ```json
->    {
->        "title": "CREATED",
->        "description": "resource created successful"
->    }
->    ```
+  ```json
+    {
+      "name"       : "Digital Ocean",
+      "description": "smart cloud platform",
+      "login"      : "random.user@gmail.com",
+      "url"        : "https://cloud.digitalocean.com/login",
+      "password"   : "motdepasse#38"
+    }
+  ```
 
 ### GET PASSWORD ITEM
 
@@ -182,6 +171,7 @@ via the POST method._
 - Request : ```http://quarkey.codewire/api/account/item/password```
 - Parameter :
   - password_id : ```UUID password id```
+- Example : ```http://quarkey.codewire/api/account/item/password?password_id=8ef944aa5b7c458d9ef9b60ab90d3e5a```
 
 ### CREATE TAG ITEM
 
@@ -191,12 +181,12 @@ _A tag name is unique per account_
 - Request : ```http://quarkey.codewire/api/account/item/tag```
 - Body :
 
->    ```json
->    {
->        "name"   : "Digital Ocean",
->        "color"  : "blue" 
->    }
->    ```
+  ```json
+  {
+    "name"   : "Digital Ocean",
+    "color"  : "blue" 
+  }
+  ```
 
 ### GET TAG ITEM
 
@@ -215,20 +205,37 @@ _**In development**_
 
 ### CREATE LINK PASSWORD TO TAG
 
-- Method : ```GET```
-- Request : ```http://quarkey.codewire/api/account/item/{password_id}/link/to/tag/{tag_id}```
-- Request : ```http://quarkey.codewire/api/account/item/{password_id}/link/to/tag/{tag_name}```
+- Method : ```POST```
+- Request : ```http://quarkey.codewire/api/account/item/password/link/to/tag```
 - Parameter :
   - password_id : ```UUID password id```
   - tag_id      : ```UUID tag id you want to link to password```
   - tag_name    : ```TEXT tag name you want to link to password```
+- Body :
+  ```json
+  {
+	  "password_id": "b8174dd5-b93a-4a1c-86bd-b8854709e475",
+	  "tag_id": "5c8b07d3-767b-4f82-8701-318e35b65550"
+  }
+  ```
 
 ### DELETE LINK PASSWORD TO TAG
 
 - Method : ```DELETE```
-- Request : ```http://quarkey.codewire/api/account/item/{password_id}/link/to/tag/{tag_id}```
-- Request : ```http://quarkey.codewire/api/account/item/{password_id}/link/to/tag/{tag_name}```
+- Request : ```http://quarkey.codewire/api/account/item/password/link/to/tag```
 - Parameter :
   - password_id : ```UUID password id```
   - tag_id      : ```UUID tag id you want to link to password```
-  - tag_name    : ```TEXT tag name you want to link to password```
+  - tag_name    : ```TEXT tag name you want to link to password``` _you can specify tag name instead tag id_
+- Body : 
+  ```json
+  {
+	  "password_id": "b8174dd5-b93a-4a1c-86bd-b8854709e475",
+	  "tag_id": "5c8b07d3-767b-4f82-8701-318e35b65550"
+  }
+  ```
+
+### CREATE TESTER KEY
+
+- Method : ```POST```
+- Request : ```http://quarkey.codewire/api/account/tester/key```
