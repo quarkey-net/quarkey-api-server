@@ -11,6 +11,23 @@ _"A RESTful api for the Quarkey password manager and its web application made in
 > If you wish to use the API in a public development version you will need to request a development key to activate your account. Please contact us at 
 **esteban.ristich@protonmail.com** or notify us on our discord server.
 
+### Table of contents
+1. [Quickstart](#quickstart)
+	1. [Linux dependencies](#linux-dependencies-debian--ubuntu)
+	2. [Building](#building)
+
+2. [Documentation](#documentation)
+	1. [Create account](#Create-account)
+	2. [Login to account](#Login-to-account)
+	3. [Create password item](#Create-password-item)
+	4. [Get password item](#Get-password-item)
+	5. [Delete password item](#Delete-password-item)
+	6. [Create tag item](#Create-tag-item)
+	7. [Get tag item](#Get-tag-item)
+	8. [Link password to tag](#Link-password-to-tag)
+	9. [Unlink password from tag](#Unlink-password-from-tag)
+	10. [Create tester key](#Create-tester-key)
+
 ## Quickstart
 
 The API can be built locally. For a precise configuration of the api when it is launched, please refer to the file **utils/configs.py**
@@ -52,20 +69,6 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 > The API currently only supports JSON. So please define in your header the following key and value `'Content-Type': 'application/json'` and your token `'Authorization': 'YOUR_TOKEN'`. This token will be needed to access all resources, except :
 > - ```http://quarkey.herokuapp.com/api/auth/register```
 > - ```http://quarkey.codewire.co/api/auth/login```
-
-### Table of contents
-1. [Create account](#Create-account)
-2. [Login to account](#Login-to-account)
-3. [Create password item](#Create-password-item)
-4. [Get password item](#Get-password-item)
-5. [Delete password item](#Delete-password-item)
-6. [Create tag item](#Create-tag-item)
-7. [Get tag item](#Get-tag-item)
-8. [Link password to tag](#Link-password-to-tag)
-9. [Unlink password from tag](#Unlink-password-from-tag)
-10. [Create tester key](#Create-tester-key)
-
-<hr>
 
 ### Create account
 
