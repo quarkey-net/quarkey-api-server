@@ -93,7 +93,7 @@ class PasswordItem(object):
         print(q1)
         for x in q1:
             pass_itm: dict = {}
-            pass_itm["id"]      = x[0].hex
+            pass_itm["id"]      = uuid.UUID(x[0]).hex
             pass_itm["type"]    = x[1]
             pass_itm["name"]    = x[2]
             pass_itm["description"] = x[3]
@@ -104,16 +104,16 @@ class PasswordItem(object):
             pass_itm["url"]         = x[5]
             pass_itm["tags"]        = []
             for y in q2:
-                if x[0].hex == y[0].hex:
+                if uuid.UUID(x[0]).hex == uuid.UUID(y[0]).hex:
                     tag_itm: dict = {}
-                    tag_itm["id"] = y[1].hex
+                    tag_itm["id"] = uuid.UUID(y[1]).hex
                     tag_itm["name"] = y[2]
                     tag_itm["color"] = y[3]
                     pass_itm["tags"].append(tag_itm)
             results.append(pass_itm)
 
         resp.status = falcon.HTTP_OK
-        resp.media  = {"title": "OK", "description": "password list getted successful", "content": results}
+        resp.media  = {"title": "OK", "description": "password list getted successful", "content": {"username": payload["uid"], "fullname": payload["fullname"], "items" : results}}
         return
 
 
