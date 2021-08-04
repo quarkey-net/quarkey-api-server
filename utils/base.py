@@ -1,5 +1,5 @@
 from __future__ import print_function
-import datetime, peewee, falcon, jsonschema, sys, logging, os, random
+import datetime, falcon, jsonschema, sys, logging, os, random
 from utils.config import AppState
 
 # EMAIL = yagmail.SMTP(API_DEV_EMAIL_EXPEDITOR, API_DEV_EMAIL_PASSWORD)
