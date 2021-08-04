@@ -1,6 +1,6 @@
 # REST API Backend for Quarkey Frontend
 
-<center><img src="https://github.com/PowerSaucisse/quarkey-api-server/blob/main/assets/img/quarkey-full.png?raw=true" alt="Quarkey" width="100%"></center>
+<center><img src="/assets/img/quarkey-full.png?raw=true" alt="Quarkey" width="100%"></center>
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/PowerSaucisse/Quarkey-api-server) [![Chat](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/PatReunPk5)
 
