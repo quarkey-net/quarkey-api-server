@@ -11,5 +11,5 @@ CREATE TRIGGER trgg_auto_update_passwords
 
 
 CREATE TRIGGER trgg_auto_update_auth_token_rsa
-    BEFORE UPDATE ON passwords FOR EACH ROW
+    BEFORE UPDATE ON auth_token_rsa FOR EACH ROW
     EXECUTE PROCEDURE func_update_tmstmp();
