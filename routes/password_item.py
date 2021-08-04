@@ -14,13 +14,13 @@ class PasswordItem(object):
             "$schema": AppState.Tools.JSONSCHEMA_VERSION,
             "type": "object",
             "properties": {
-                "title"         : {"type": "string"},
+                "name"         : {"type": "string"},
                 "description"   : {"type": "string"},
-                "username"      : {"type": "string"},
+                "login"         : {"type": "string"},
                 "password"      : {"type": "string"},
                 "url"           : {"type": "string"}
             },
-            "required": ["title", "password"]
+            "required": ["name", "password"]
         }
 
     @falcon.before(AuthorizeAccount(roles=['standard']))
@@ -30,7 +30,7 @@ class PasswordItem(object):
             payload = self._token_controller.decode(req.get_header('Authorization'))
             q1 = None
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute("SELECT id FROM passwords WHERE f_owner = %s AND name = %s", (payload['uid'], req.media['title']))
+                cur.execute("SELECT id FROM passwords WHERE f_owner = %s AND name = %s", (payload['uid'], req.media['name']))
                 q1 = cur.fetchone()
 
             if q1 is not None:
@@ -46,9 +46,9 @@ class PasswordItem(object):
                     (
                         puuid,
                         payload['uid'],
-                        req.media['title'],
+                        req.media['name'],
                         req.media['description'],
-                        req.media['username'],
+                        req.media['login'],
                         req.media['password'],
                         req.media['url']
                     )
