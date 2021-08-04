@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS tags (
     f_owner     VARCHAR(24) NOT NULL,
     name        VARCHAR(20) NOT NULL,
     color       VARCHAR(8) DEFAULT NULL,
-    icon        VARCHAR(40) DEFAULT NULL
+    icon        VARCHAR(40) DEFAULT NULL,
     -- See to add icon in relational table maybe
     CONSTRAINT fk_account
         FOREIGN KEY(f_owner)
