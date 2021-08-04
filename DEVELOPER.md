@@ -19,17 +19,15 @@ pouvez demander des clés à l'une des adresses suivantes :
 
 ### CREATE AN ACCOUNT
 
-
-
 - Method : ```POST```
 - Request : ```http://quarkey.herokuapp.com/api/auth/register```
 - Parameter :
-  - username  : _Username take minimum 3 characters and 24 max with numbers but no special characters execpt underscore_
-  - firstname : _Firstname take minimum 2 characters and 20 max_
-  - lastname  : _Lastname take minimum 2 characters and 20 max_
-  - email     : _Take email format_
-  - password  : _Password must have at least one capital letter and one special character and one number. He must have also 8 minimum characters_
-  - key       : _20 characters key_
+  - username  : ```TEXT``` _Username take minimum 3 characters and 24 max with numbers but no special characters execpt underscore_
+  - firstname : ```TEXT``` _Firstname take minimum 2 characters and 20 max_
+  - lastname  : ```TEXT``` _Lastname take minimum 2 characters and 20 max_
+  - email     : ```TEXT```_Take email format_
+  - password  : ```TEXT``` _Password must have at least one capital letter and one special character and one number. He must have also 8 minimum characters_
+  - key       : ```TEXT``` _20 characters key_
 - Body :
 
   ```json
@@ -39,13 +37,12 @@ pouvez demander des clés à l'une des adresses suivantes :
           "lastname" : "Ristich",
           "email"    : "esteban.ristich@protonmail.com",
           "password" : "Motdepasse#38",
-          "key"      : "<TESTER KEY>" # past your tester key
+          "key"      : "<TESTER KEY>"
       }
   ```
 
 ### LOGIN TO AN ACCOUNT
-
-_For security and caching reasons, login requests are made via the POST method._
+>_For security and caching reasons, login requests are made via the POST method._
 
 - Method : ```POST```
 - Request : ```http://quarkey.codewire.co/api/auth/login```
@@ -89,6 +86,7 @@ _For security and caching reasons, login requests are made via the POST method._
 - Method : ```GET```
 - Request : ```http://quarkey.codewire/api/account/item/password```
 - Return :
+  
   ```json
     {
       "title": "OK",
@@ -174,8 +172,7 @@ _For security and caching reasons, login requests are made via the POST method._
 - Example : ```http://quarkey.codewire/api/account/item/password?password_id=8ef944aa5b7c458d9ef9b60ab90d3e5a```
 
 ### CREATE TAG ITEM
-
-_A tag name is unique per account_
+> _A tag name is unique per account_
 
 - Method : ```POST```
 - Request : ```http://quarkey.codewire/api/account/item/tag```
@@ -189,7 +186,6 @@ _A tag name is unique per account_
   ```
 
 ### GET TAG ITEM
-
 _**In development**_
 
 - Method : ```GET```
@@ -200,18 +196,19 @@ _**In development**_
 - Method : ```DELETE```
 - Request : ```http://quarkey.codewire/api/account/item/tag```
 - Parameter :
-  - tag_id    : ```UUID tag id```
-  - tag_name  : ```TEXT tag name```
+  - tag_id    : ```UUID```
+  - tag_name  : ```TEXT```
 
 ### CREATE LINK PASSWORD TO TAG
 
 - Method : ```POST```
 - Request : ```http://quarkey.codewire/api/account/item/password/link/to/tag```
 - Parameter :
-  - password_id : ```UUID password id```
-  - tag_id      : ```UUID tag id you want to link to password```
-  - tag_name    : ```TEXT tag name you want to link to password```
+  - password_id : ```UUID```
+  - tag_id      : ```UUID```
+  - tag_name    : ```TEXT``` _you can specify tag name instead tag id_
 - Body :
+  
   ```json
   {
 	  "password_id": "b8174dd5-b93a-4a1c-86bd-b8854709e475",
@@ -224,10 +221,11 @@ _**In development**_
 - Method : ```DELETE```
 - Request : ```http://quarkey.codewire/api/account/item/password/link/to/tag```
 - Parameter :
-  - password_id : ```UUID password id```
-  - tag_id      : ```UUID tag id you want to link to password```
-  - tag_name    : ```TEXT tag name you want to link to password``` _you can specify tag name instead tag id_
+  - password_id : ```UUID```
+  - tag_id      : ```UUID```
+  - tag_name    : ```TEXT``` _you can specify tag name instead tag id_
 - Body : 
+
   ```json
   {
 	  "password_id": "b8174dd5-b93a-4a1c-86bd-b8854709e475",
