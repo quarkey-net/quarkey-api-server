@@ -65,6 +65,8 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 9. [Unlink password from tag](#Unlink-password-from-tag)
 10. [Create tester key](#Create-tester-key)
 
+<hr>
+
 ### Create account
 
 - Method : ```POST```
