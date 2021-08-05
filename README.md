@@ -10,6 +10,7 @@ _"A RESTful api for the Quarkey password manager and its web application made in
 
 > If you wish to use the API in a public development version you will need to request a development key to activate your account. Please contact us at 
 **esteban.ristich@protonmail.com** or notify us on our discord server.
+<<<<<<< HEAD
 
 ### Table of contents
 1. [Quickstart](#quickstart)
@@ -27,6 +28,29 @@ _"A RESTful api for the Quarkey password manager and its web application made in
 	8. [Link password to tag](#Link-password-to-tag)
 	9. [Unlink password from tag](#Unlink-password-from-tag)
 	10. [Create tester key](#Create-tester-key)
+=======
+
+## Table of contents
+- [REST API Backend for Quarkey Frontend](#rest-api-backend-for-quarkey-frontend)
+  - [Introduction](#introduction)
+  - [Table of contents](#table-of-contents)
+  - [Quickstart](#quickstart)
+    - [Linux dependencies (Debian & Ubuntu)](#linux-dependencies-debian--ubuntu)
+    - [Building](#building)
+  - [Documentation](#documentation)
+    - [Create account](#create-account)
+    - [Login to account](#login-to-account)
+    - [Create password item](#create-password-item)
+    - [Get password item](#get-password-item)
+    - [Delete password item](#delete-password-item)
+    - [Create tag item](#create-tag-item)
+    - [Get tag item](#get-tag-item)
+    - [Delete tag item](#delete-tag-item)
+    - [Link password to tag](#link-password-to-tag)
+    - [Unlink password from tag](#unlink-password-from-tag)
+    - [Create tester key](#create-tester-key)
+  - [License](#license)
+>>>>>>> main
 
 ## Quickstart
 
@@ -68,7 +92,11 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 
 > The API currently only supports JSON. So please define in your header the following key and value `'Content-Type': 'application/json'` and your token `'Authorization': 'YOUR_TOKEN'`. This token will be needed to access all resources, except :
 > - ```http://quarkey.herokuapp.com/api/auth/register```
+<<<<<<< HEAD
 > - ```http://quarkey.codewire.co/api/auth/login```
+=======
+> - ```http://quarkey.herokuapp.com/api/auth/login```
+>>>>>>> main
 
 ### Create account
 
@@ -98,7 +126,11 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 >_For security and caching reasons, login requests are made via the POST method._
 
 - Method : ```POST```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire.co/api/auth/login```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/auth/login```
+>>>>>>> main
 - Body :
 
   ```json
@@ -121,7 +153,11 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 ### Create password item
 
 - Method : ```POST```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/password```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/password```
+>>>>>>> main
 - Body :
 
   ```json
@@ -137,7 +173,11 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 ### Get password item
 
 - Method : ```GET```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/password```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/password```
+>>>>>>> main
 - Return :
   
   ```json
@@ -219,16 +259,27 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 ### Delete password item
 
 - Method : ```DELETE```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/password```
 - Parameter :
   - password_id : ```UUID password id```
 - Example : ```http://quarkey.codewire/api/account/item/password?password_id=8ef944aa5b7c458d9ef9b60ab90d3e5a```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/password```
+- Parameter :
+  - password_id : ```UUID password id```
+- Example : ```http://quarkey.herokuapp.com/api/account/item/password?password_id=8ef944aa5b7c458d9ef9b60ab90d3e5a```
+>>>>>>> main
 
 ### Create tag item
 > _A tag name is unique per account_
 
 - Method : ```POST```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/tag```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/tag```
+>>>>>>> main
 - Body :
 
   ```json
@@ -242,12 +293,20 @@ There is currently no domain name assigned to the service. However, a Heroku ver
 _**In development**_
 
 - Method : ```GET```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/tag```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/tag```
+>>>>>>> main
 
 ### Delete tag item
 
 - Method : ```DELETE```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/tag```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/tag```
+>>>>>>> main
 - Parameter :
   - tag_id    : ```UUID```
   - tag_name  : ```TEXT```
@@ -255,7 +314,11 @@ _**In development**_
 ### Link password to tag
 
 - Method : ```POST```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/password/link/to/tag```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/password/link/to/tag```
+>>>>>>> main
 - Parameter :
   - password_id : ```UUID```
   - tag_id      : ```UUID```
@@ -272,7 +335,11 @@ _**In development**_
 ### Unlink password from tag
 
 - Method : ```DELETE```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/item/password/link/to/tag```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/item/password/link/to/tag```
+>>>>>>> main
 - Parameter :
   - password_id : ```UUID```
   - tag_id      : ```UUID```
@@ -289,7 +356,11 @@ _**In development**_
 ### Create tester key
 
 - Method : ```POST```
+<<<<<<< HEAD
 - Request : ```http://quarkey.codewire/api/account/tester/key```
+=======
+- Request : ```http://quarkey.herokuapp.com/api/account/tester/key```
+>>>>>>> main
 
 ## License
 
