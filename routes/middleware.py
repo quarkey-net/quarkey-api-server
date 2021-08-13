@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from database.database import PGDatabase
 from utils.config import AppState
 from utils.security.auth import AccountAuthToken
 import falcon
@@ -43,18 +44,18 @@ class CORSMiddleware(object):
         api_message('WARNING', f'{resp.headers}')
 """
 
-"""
+
 class DatabaseConnectMiddleware():
     
     def process_resource(self, req, resp, resource, params):
         if resource is not None:
-            if db.is_closed():
-                db.connect()
-    
+            AppState.Database.CONN.close()
+            AppState.Database.CONN = PGDatabase().connect()
+
     def process_response(self, req, resp, resource, req_succeeded):
-        if not db.is_closed():
-            db.close()
-"""
+        if AppState.Database.CONN:
+            AppState.Database.CONN.close()
+
 
 class AuthorizeAccount:
     def __init__(self, roles: list):
