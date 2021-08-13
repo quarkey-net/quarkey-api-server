@@ -53,21 +53,26 @@ class Register(object):
                 datenow = datetime.datetime.utcnow()
 
                 with AppState.Database.CONN.cursor() as cur:
-                    cur.execute(
-                        "INSERT INTO accounts (id, firstname, lastname, email, password, public_key, private_key, roles, f_tester_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                        (
-                            req.media['username'],
-                            req.media['firstname'],
-                            req.media['lastname'],
-                            req.media['email'],
-                            self.password_hasher.hash_password(req.media['password']),
-                            keypair[0],
-                            keypair[1],
-                            "standard",
-                            key_id
+                    try:
+                        cur.execute(
+                            "INSERT INTO accounts (id, firstname, lastname, email, password, public_key, private_key, roles, f_tester_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                            (
+                                req.media['username'],
+                                req.media['firstname'],
+                                req.media['lastname'],
+                                req.media['email'],
+                                self.password_hasher.hash_password(req.media['password']),
+                                keypair[0],
+                                keypair[1],
+                                "standard",
+                                key_id
+                            )
                         )
-                    )
-                AppState.Database.CONN.commit()
+                        AppState.Database.CONN.commit()
+                    except Exception as e:
+                        AppState.Database.CONN.rollback()
+                        api_message("e", f'Failed transaction : {e}')
+                        raise falcon.HTTPBadRequest()
             
         
                 api_message('d', "successfull register (user=\"{0}\", uid={1})".format(req.media['firstname'] + ' ' + req.media['lastname'], req.media['username']))

@@ -14,7 +14,7 @@ class PasswordItem(object):
             "$schema": AppState.Tools.JSONSCHEMA_VERSION,
             "type": "object",
             "properties": {
-                "name"         : {"type": "string"},
+                "name"          : {"type": "string"},
                 "description"   : {"type": "string"},
                 "login"         : {"type": "string"},
                 "password"      : {"type": "string"},
@@ -41,21 +41,26 @@ class PasswordItem(object):
             puuid = uuid.uuid4().hex
             tag_id = uuid.uuid4().hex
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO passwords (id, f_owner, name, description, login, password_1, url) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
-                    (
-                        puuid,
-                        payload['uid'],
-                        req.media['name'],
-                        req.media['description'],
-                        req.media['login'],
-                        req.media['password'],
-                        req.media['url']
+                try:
+                    cur.execute(
+                        "INSERT INTO passwords (id, f_owner, name, description, login, password_1, url) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
+                        (
+                            puuid,
+                            payload['uid'],
+                            req.media['name'],
+                            req.media['description'],
+                            req.media['login'],
+                            req.media['password'],
+                            req.media['url']
+                        )
                     )
-                )
-                cur.execute("INSERT INTO tags (id, f_owner, name, color) VALUES (%s, %s, %s, %s)", (tag_id, payload["uid"], "global", "white"))
-                cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (puuid, tag_id))
-                AppState.Database.CONN.commit()
+                    cur.execute("INSERT INTO tags (id, f_owner, name, color) VALUES (%s, %s, %s, %s)", (tag_id, payload["uid"], "global", "white"))
+                    cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (puuid, tag_id))
+                    AppState.Database.CONN.commit()
+                except Exception as e:
+                    AppState.Database.CONN.rollback()
+                    api_message("e", f'Failed transaction : {e}')
+                    raise falcon.HTTPBadRequest()
 
             
         resp.status = falcon.HTTP_CREATED
@@ -132,9 +137,14 @@ class PasswordItem(object):
             return
 
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("DELETE FROM password_tag_linkers AS t1 USING passwords AS t2 WHERE t1.f_password = %s AND t2.id = %s AND t2.f_owner = %s", (password_id, password_id, payload["uid"]))
-            cur.execute("DELETE FROM tags AS t1 WHERE id = %s", (tag_global_id,))
-            cur.execute("DELETE FROM passwords WHERE id = %s AND f_owner = %s", (password_id, payload["uid"]))
-            AppState.Database.CONN.commit()
+            try:
+                cur.execute("DELETE FROM password_tag_linkers AS t1 USING passwords AS t2 WHERE t1.f_password = %s AND t2.id = %s AND t2.f_owner = %s", (password_id, password_id, payload["uid"]))
+                cur.execute("DELETE FROM tags AS t1 WHERE id = %s", (tag_global_id,))
+                cur.execute("DELETE FROM passwords WHERE id = %s AND f_owner = %s", (password_id, payload["uid"]))
+                AppState.Database.CONN.commit()
+            except Exception as e:
+                AppState.Database.CONN.rollback()
+                api_message("e", f'Failed transaction : {e}')
+                raise falcon.HTTPBadRequest()
         
         resp.status = falcon.HTTP_200

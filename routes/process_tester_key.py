@@ -32,8 +32,13 @@ class ProcessTesterKey:
         key: str = gen_random_test_key()
         expiration = datetime.datetime.utcnow() + datetime.timedelta(days=90)
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("INSERT INTO tester_keys (id, type, expiration_on) VALUES (%s, %s, %s)", (key, AppState.TAG, expiration))
-            AppState.Database.CONN.commit()
+            try:
+                cur.execute("INSERT INTO tester_keys (id, type, expiration_on) VALUES (%s, %s, %s)", (key, AppState.TAG, expiration))
+                AppState.Database.CONN.commit()
+            except Exception as e:
+                AppState.Database.CONN.rollback()
+                api_message("e", f'Failed transaction : {e}')
+                raise falcon.HTTPBadRequest()
 
         if "moderator" in account_roles:
             resp.media = {"title": "CREATED", "description": "tester key created successful", "content": {"key": key, "type": AppState.TAG, "expiration": expiration.strftime("%d-%m-%Y %H:%M:%S")}}

@@ -36,8 +36,13 @@ class ProcessLinkTag:
             # analyse
             tag_id = q2[0].hex
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (password_id, tag_id))
-                AppState.Database.CONN.commit()
+                try:
+                    cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (password_id, tag_id))
+                    AppState.Database.CONN.commit()
+                except Exception as e:
+                    AppState.Database.CONN.rollback()
+                    api_message("e", f'Failed transaction : {e}')
+                    raise falcon.HTTPBadRequest()
             
             resp.status = falcon.HTTP_CREATED
             resp.media  = {"title": "CREATED", "description": "sucess to attach tag", "content": {"password_id": password_id, "tag_id": tag_id}}
@@ -48,7 +53,13 @@ class ProcessLinkTag:
         payload = self._token_controller.decode(req.get_header('Authorization'))
         tag_id = req.get_param("tag_id")
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("DELETE FROM password_tag_linkers AS t1 USING tags AS t2 WHERE t2.f_owner = %s AND t2.name != 'global' AND t1.f_tag = %s AND t2.id = %s", (payload["uid"], tag_id, tag_id))
-            AppState.Database.CONN.commit()
+            try:
+                cur.execute("DELETE FROM password_tag_linkers AS t1 USING tags AS t2 WHERE t2.f_owner = %s AND t2.name != 'global' AND t1.f_tag = %s AND t2.id = %s", (payload["uid"], tag_id, tag_id))
+                AppState.Database.CONN.commit()
+            except Exception as e:
+                AppState.Database.CONN.rollback()
+                api_message("e", f'Failed transaction : {e}')
+                raise falcon.HTTPBadRequest()
+
         resp.status = falcon.HTTP_200
 

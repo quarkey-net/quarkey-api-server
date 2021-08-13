@@ -27,17 +27,22 @@ class ProcessTag:
             return
             
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute(
-                "INSERT INTO tags (id, f_owner, name, color) VALUES (%s, %s, %s, %s)",
-                (
-                    tag_id,
-                    payload["uid"],
-                    req.media["name"],
-                    req.media["color"]
+            try:
+                cur.execute(
+                    "INSERT INTO tags (id, f_owner, name, color) VALUES (%s, %s, %s, %s)",
+                    (
+                        tag_id,
+                        payload["uid"],
+                        req.media["name"],
+                        req.media["color"]
+                    )
                 )
-            )
+                AppState.Database.CONN.commit()
+            except Exception as e:
+                AppState.Database.CONN.rollback()
+                api_message("e", f'Failed transaction : {e}')
+                raise falcon.HTTPBadRequest()
 
-            AppState.Database.CONN.commit()
 
         resp.status = falcon.HTTP_CREATED
         resp.media = {"title": "CREATED", "description": "tag created successful", "content": {"tag_id": tag_id}}
@@ -63,9 +68,14 @@ class ProcessTag:
 
         tag_id = q1[0].hex
         with AppState.Database.CONN.cursor() as cur:
-            cur.execute("DELETE FROM password_tag_linkers WHERE f_tag = %s", (tag_id,))
-            cur.execute("DELETE FROM tags AS t1 WHERE t1.id = %s", (tag_id,))
-            AppState.Database.CONN.commit()
+            try:
+                cur.execute("DELETE FROM password_tag_linkers WHERE f_tag = %s", (tag_id,))
+                cur.execute("DELETE FROM tags AS t1 WHERE t1.id = %s", (tag_id,))
+                AppState.Database.CONN.commit()
+            except Exception as e:
+                AppState.Database.CONN.rollback()
+                api_message("e", f'Failed transaction : {e}')
+                raise falcon.HTTPBadRequest()
         
         resp.status = falcon.HTTP_OK
 
