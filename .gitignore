@@ -145,3 +145,5 @@ gen_simulation.sql
 gen_token_keypair.py
 database/linker.sql
 database/tests
+tests.py
+quantum_tests.py
