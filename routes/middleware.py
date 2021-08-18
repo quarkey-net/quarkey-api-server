@@ -26,8 +26,8 @@ class AcceptJSONMiddleware(object):
             
 
     def process_response(self, req, resp, resource, req_succeeded):
-        resp.append_header('Accept', falcon.MEDIA_JSON)
-        resp.append_header('X-Api-Version', ".".join(map(str, AppState.VERSION)))
+        resp.set_header('Accept', falcon.MEDIA_JSON)
+        resp.set_header('X-Api-Version', ".".join(map(str, AppState.VERSION)))
 
 class CORSMiddleware(object):
     
