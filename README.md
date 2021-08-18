@@ -69,6 +69,7 @@ $ python launch.py
 
 There is currently no domain name assigned to the service. However, a Heroku version is hosted in order to perform security tests and audits. If you wish to contribute, you can request key from the following address:
   - esteban.ristich@protonmail.com
+  - regis.brasme@gmail.com
 
 > The API currently only supports JSON. So please define in your header the following key and value `'Content-Type': 'application/json'` and your token `'Authorization': 'YOUR_TOKEN'`. This token will be needed to access all resources, except :
 > - ```http://quarkey.herokuapp.com/api/auth/register```
