@@ -34,7 +34,7 @@ class ProcessLinkTag:
 
         if len(q1) > 0 and len(q2) > 0:
             # analyse
-            tag_id = q2[0].hex
+            tag_id = uuid.UUID(q2[0]).hex
             with AppState.Database.CONN.cursor() as cur:
                 try:
                     cur.execute("INSERT INTO password_tag_linkers (f_password, f_tag) VALUES (%s, %s)", (password_id, tag_id))
