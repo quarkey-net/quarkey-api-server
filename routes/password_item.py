@@ -94,8 +94,7 @@ class PasswordItem(object):
             resp.media = {"title": "BAD_REQUEST", "description": "empty password items"}
             return
         
-        results: list = [] 
-        print(q1)
+        results: list = []
         for x in q1:
             pass_itm: dict = {}
             pass_itm["id"]      = uuid.UUID(x[0]).hex
