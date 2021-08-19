@@ -66,7 +66,7 @@ class ProcessTag:
         if q1 is None or len(q1) < 1:
             return
 
-        tag_id = q1[0].hex
+        tag_id = uuid.UUID(q1[0]).hex
         with AppState.Database.CONN.cursor() as cur:
             try:
                 cur.execute("DELETE FROM password_tag_linkers WHERE f_tag = %s", (tag_id,))
@@ -79,4 +79,29 @@ class ProcessTag:
         
         resp.status = falcon.HTTP_OK
 
+
+    @falcon.before(AuthorizeAccount(roles=["standard"]))
+    def on_get(self, req, resp):
+        resp.status = falcon.HTTP_400
+        payload = self._token_controller.decode(req.get_header('Authorization'))
+        q1 = None
+        with AppState.Database.CONN.cursor() as cur:
+            cur.execute("SELECT id, name, color FROM tags WHERE f_owner = %s AND name != 'global'", (payload["uid"],))
+            q1 = cur.fetchall()
         
+        if len(q1) < 1:
+            resp.status = falcon.HTTP_200 
+            resp.media  = {"title": "OK", "description": "Empty tag list"}
+            return
+
+        results: list = []
+        for x in q1:
+            tag_itm: dict = {}
+            tag_itm["id"]       = uuid.UUID(x[0]).hex
+            tag_itm["name"]     = x[1]
+            tag_itm["color"]    = x[2]
+            results.append(tag_itm)
+
+        resp.status = falcon.HTTP_OK
+        resp.media  = {"title": "OK", "description": "tags getted successful", "content": results}
+        return
