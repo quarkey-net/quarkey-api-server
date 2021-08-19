@@ -244,7 +244,6 @@ There is currently no domain name assigned to the service. However, a Heroku ver
   ```
 
 ### Get tag item
-_**In development**_
 
 - Method : ```GET```
 - Request : ```http://quarkey.herokuapp.com/api/account/item/tag```
