@@ -23,10 +23,15 @@ class ProcessLinkTag:
             cur.execute("SELECT t1.id, t1.name FROM passwords AS t1 WHERE t1.id = %s AND t1.f_owner = %s", (password_id, payload["uid"]))
             q1 = cur.fetchone()
         with AppState.Database.CONN.cursor() as cur:
-            if ((tag_name is not None or tag_name != "") and tag_name != "global"):
-                cur.execute("SELECT t1.id, t1.name FROM tags AS t1 WHERE t1.name = %s AND t1.f_owner = %s", (tag_name, payload["uid"]))
-            else:
+            try:
+                uuid.UUID(password_id)
+                uuid.UUID(tag_id)
                 cur.execute("SELECT t1.id, t1.name FROM tags AS t1 WHERE t1.id = %s AND t1.f_owner = %s", (tag_id, payload["uid"]))
+            except:
+                if ((tag_name is not None or tag_name != "") and tag_name != "global"):
+                    cur.execute("SELECT t1.id, t1.name FROM tags AS t1 WHERE t1.name = %s AND t1.f_owner = %s", (tag_name, payload["uid"]))
+                else:
+                    raise falcon.HTTPBadRequest()
             q2 = cur.fetchone()
 
         if q1 is None or q2 is None:
