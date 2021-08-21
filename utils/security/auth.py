@@ -3,6 +3,9 @@ import argon2, falcon, datetime
 from utils.base import api_message
 from authlib import jose
 
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
@@ -127,19 +130,29 @@ class UserPasswordHasher():
 
         return False
 
-""" 
-def create_verification_token(duration=300):
+
+
+def encrypt_AES_GCM(msg: str, password: bytes) -> tuple:
+    kdfSalt = b'$' + get_random_bytes(30) + b'$'
     try:
-        payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=duration),
-            'sub': uuid.uuid4().hex
-        }
-        return jwt.encode(
-            payload,
-            API_JWT_SECRET,
-            algorithm='HS256'
-        )
+        msg = msg.encode(encoding='utf-8', errors='strict')
+        secretKey = argon2.hash_password_raw(password, hash_len=32, type=argon2.Type.ID, salt=kdfSalt)
+        aesCipher = AES.new(key=secretKey, mode=AES.MODE_GCM, nonce=get_random_bytes(64))
+        ciphertext, authTag = aesCipher.encrypt_and_digest(msg)
     except Exception as e:
-        print(e)
-        raise falcon.HTTPInternalServerError(title="account auth token", description="")
- """
+        api_message("w", f'Failed to encrypt data : {e}')
+        raise falcon.HTTPBadRequest()
+    return (kdfSalt, ciphertext, aesCipher.nonce, authTag)
+
+
+
+def decrypt_AES_GCM(encryptedMsg: tuple, password: bytes):
+    (kdfSalt, ciphertext, nonce, authTag) = encryptedMsg
+    try:
+        secretKey = argon2.hash_password_raw(password, hash_len=32, type=argon2.Type.ID, salt=kdfSalt)
+        aesCipher = AES.new(secretKey, AES.MODE_GCM, nonce)
+        plaintext = aesCipher.decrypt_and_verify(ciphertext, authTag)
+    except Exception as e:
+        api_message("w", f'Failed to decrypt data : {e}')
+        raise falcon.HTTPBadRequest()
+    return plaintext
