@@ -64,7 +64,7 @@ class PasswordItem(object):
 
             
         resp.status = falcon.HTTP_CREATED
-        resp.media  = {"title": "CREATED", "description": "resource created successful", "content": {"password_id": puuid}}
+        resp.media  = {"title": "CREATED", "description": "resource created successful", "content": {"password_id": uuid.UUID(puuid).hex}}
 
 
 
