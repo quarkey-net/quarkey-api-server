@@ -1,7 +1,7 @@
 from utils.security.auth import AccountAuthToken
 import falcon, uuid, datetime
 
-from routes.middleware import AuthorizeAccount
+from routes.middleware import AuthorizeResource
 from utils.base import api_validate_form, api_message
 from utils.config import AppState
 
@@ -11,6 +11,7 @@ class ProcessLinkTag:
     def __init__(self) -> None:
         self._token_controller = AccountAuthToken('', '')
 
+    @falcon.before(AuthorizeResource(roles=['standard']))
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
@@ -53,6 +54,7 @@ class ProcessLinkTag:
             resp.media  = {"title": "CREATED", "description": "sucess to attach tag", "content": {"password_id": password_id, "tag_id": tag_id}}
             return
 
+    @falcon.before(AuthorizeResource(roles=['standard']))
     def on_delete(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))

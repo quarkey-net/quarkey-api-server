@@ -1,13 +1,13 @@
 from utils.security.auth import AccountAuthToken
 import falcon, uuid, datetime, os
 
-from routes.middleware import AuthorizeAccount
+from routes.middleware import AuthorizeResource
 from utils.base import api_validate_form, api_message
 from utils.config import AppState
 
 class ProcessGenData:
 
-    @falcon.before(AuthorizeAccount(roles=["moderator", "admin"]))
+    @falcon.before(AuthorizeResource(roles=["moderator", "admin"]))
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         user_list_file = "routes/tools/user_list.txt"

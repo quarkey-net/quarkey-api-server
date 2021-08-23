@@ -1,7 +1,7 @@
 from utils.security.auth import AccountAuthToken
 import falcon, uuid, datetime
 
-from routes.middleware import AuthorizeAccount
+from routes.middleware import AuthorizeResource
 from utils.base import api_validate_form, api_message, gen_random_test_key
 from utils.config import AppState
 
@@ -11,7 +11,7 @@ class ProcessTesterKey:
     def __init__(self) -> None:
         self._token_controller = AccountAuthToken('', '')
 
-    @falcon.before(AuthorizeAccount(roles=["standard", "moderator"]))
+    @falcon.before(AuthorizeResource(roles=["standard", "moderator"]))
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))

@@ -1,7 +1,7 @@
 from utils.security.auth import AccountAuthToken
 import falcon, uuid, datetime
 
-from routes.middleware import AuthorizeAccount
+from routes.middleware import AuthorizeResource
 from utils.base import api_validate_form, api_message
 from utils.config import AppState
 
@@ -11,7 +11,7 @@ class ProcessTag:
     def __init__(self) -> None:
         self._token_controller = AccountAuthToken('', '')
 
-    @falcon.before(AuthorizeAccount(roles=['standard']))
+    @falcon.before(AuthorizeResource(roles=['standard']))
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
@@ -48,7 +48,7 @@ class ProcessTag:
         resp.media = {"title": "CREATED", "description": "tag created successful", "content": {"tag_id": tag_id}}
 
 
-    @falcon.before(AuthorizeAccount(roles=["standard"]))
+    @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_delete(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
@@ -80,7 +80,7 @@ class ProcessTag:
         resp.status = falcon.HTTP_OK
 
 
-    @falcon.before(AuthorizeAccount(roles=["standard"]))
+    @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_400
         payload = self._token_controller.decode(req.get_header('Authorization'))

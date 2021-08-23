@@ -57,7 +57,7 @@ class DatabaseConnectMiddleware():
             AppState.Database.CONN.close()
 
 
-class AuthorizeAccount:
+class AuthorizeResource:
     def __init__(self, roles: list):
         self._token_controller  = AccountAuthToken('', '')
         self._roles             = roles

@@ -1,7 +1,7 @@
 from utils.security.auth import AccountAuthToken
 import falcon, uuid, datetime
 
-from routes.middleware import AuthorizeAccount
+from routes.middleware import AuthorizeResource
 from utils.base import api_validate_form, api_message
 from utils.config import AppState
 
@@ -23,7 +23,7 @@ class PasswordItem(object):
             "required": ["name", "password"]
         }
 
-    @falcon.before(AuthorizeAccount(roles=['standard']))
+    @falcon.before(AuthorizeResource(roles=['standard']))
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_400
         if api_validate_form(req.media, self.post_form):
@@ -68,7 +68,7 @@ class PasswordItem(object):
 
 
 
-    @falcon.before(AuthorizeAccount(roles=["standard"]))
+    @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
@@ -122,7 +122,7 @@ class PasswordItem(object):
 
 
 
-    @falcon.before(AuthorizeAccount(roles=["standard"]))
+    @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_delete(self, req, resp):
         resp.status = falcon.HTTP_400
         payload = self._token_controller.decode(req.get_header('Authorization'))
