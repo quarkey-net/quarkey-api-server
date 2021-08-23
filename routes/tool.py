@@ -34,11 +34,13 @@ class ProcessGenData:
                 sfile = open(email_list_file, "r")
             try:
                 tmp = sfile.readlines()
-                if len(tmp) < rnum:
+                num = rnum
+                if len(tmp) < num:
                     num = len(tmp)
                 for x in range(0, num):
                     result[y].append(tmp[x].strip())
-            except:
+            except Exception as e:
+                api_message("d", f'error : {e}')
                 sfile.close()
                 raise falcon.HTTPBadRequest()
             sfile.close()
