@@ -11,6 +11,7 @@ from routes.process_tag import ProcessTag
 from routes.process_link_tag import ProcessLinkTag
 from routes.process_tester_key import ProcessTesterKey
 from routes.password_item import PasswordItem
+from routes.tool import ProcessGenData
 
 # from routes.verify_account import VerifyAccount
 from routes.middleware import AcceptJSONMiddleware, CORSMiddleware, DebugMiddleware
@@ -69,6 +70,8 @@ api.add_route("/api/account/item/password", pass_itm)
 api.add_route("/api/account/tester/key", ProcessTesterKey())
 api.add_route("/api/account/item/tag", ProcessTag())
 api.add_route("/api/account/item/password/link/to/tag", ProcessLinkTag())
+# tools (only moderator && admin)
+api.add_route("/api/account/tool/gen/data", ProcessGenData())
 
 
 if platform.system() == "Linux":
