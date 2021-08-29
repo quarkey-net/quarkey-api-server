@@ -15,7 +15,13 @@ class ProcessTesterKey:
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         payload = self._token_controller.decode(req.get_header('Authorization'))
-        account_roles = payload["roles"].split(":")
+        account_roles = payload["roles"]
+        email_dst = req.media.get("email", None)
+
+        if email_dst is None and "moderator" not in account_roles:
+            resp.status = falcon.HTTP_BAD_REQUEST
+            resp.media  = {"title": "BAD_REQUEST", "description": "please specify the email to which to send the referral link"}
+            return
 
         """
         roles = req.media["roles"]
@@ -33,7 +39,16 @@ class ProcessTesterKey:
         expiration = datetime.datetime.utcnow() + datetime.timedelta(days=90)
         with AppState.Database.CONN.cursor() as cur:
             try:
-                cur.execute("INSERT INTO tester_keys (id, type, expiration_on) VALUES (%s, %s, %s)", (key, AppState.TAG, expiration))
+                cur.execute(
+                    "INSERT INTO tester_keys (id, type, expiration_on, f_refferer, email_recipient) VALUES (%s, %s, %s, %s, %s)", 
+                    (
+                        key, 
+                        AppState.TAG, 
+                        expiration,
+                        payload["uid"],
+                        email_dst
+                    )
+                )
                 AppState.Database.CONN.commit()
             except Exception as e:
                 AppState.Database.CONN.rollback()
@@ -41,7 +56,7 @@ class ProcessTesterKey:
                 raise falcon.HTTPBadRequest()
 
         if "moderator" in account_roles:
-            resp.media = {"title": "CREATED", "description": "tester key created successful", "content": {"key": key, "type": AppState.TAG, "expiration": expiration.strftime("%d-%m-%Y %H:%M:%S")}}
+            resp.media = {"title": "CREATED", "description": "tester key created successful", "content": {"key": key, "type": AppState.TAG, "expiration": expiration.strftime("%d-%m-%Y %H:%M:%S"), "send_to": email_dst}}
         else:
-            resp.media = {"title": "CREATED", "description": "tester key created successful"}
+            resp.media = {"title": "CREATED", "description": f'tester key send to {email_dst}'}
         resp.status = falcon.HTTP_CREATED
