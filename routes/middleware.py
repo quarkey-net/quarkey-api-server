@@ -68,9 +68,7 @@ class AuthorizeResource:
         if token is None:
             raise falcon.HTTPUnauthorized(title="UNAUTHORIZED", description="this resource require account token")
         payload = self._token_controller.decode(token)
-        roles = payload['roles'].split(':')
+        roles = payload['roles']
         for x in self._roles:
             if x not in roles:
-                resp.status = falcon.HTTP_UNAUTHORIZED
-                resp.media  = {"title": "UNAUTHORIZED", "description": "you don't have roles to access to this resource"}
-                return
+                raise falcon.HTTPUnauthorized(title="UNAUTHORIZED", description="you don't have roles to access to this resource")
