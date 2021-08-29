@@ -17,6 +17,7 @@ class PGDatabase:
                     port=AppState.Database.PORT,
                     dbname=AppState.Database.NAME
                 )
+                # api_message("i", f'encoding : {self._conn.encoding}')
             except psycopg2.DatabaseError as e:
                 api_message("d", f'Failed to connect to PostgreSQL database, error : {e}')
                 exit(0)
