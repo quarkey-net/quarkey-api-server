@@ -6,10 +6,6 @@ from utils.config import AppState
 class Login(object):
 
     def __init__(self):
-        """
-        self.username_regex     = "^(?=[a-zA-Z0-9._]{3,15}$)(?!.*[_.]{2})[^_.].*[^_.]$"
-        self.password_regex     = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,60}$"
-        """
         self.token_controller = AccountAuthToken('', '')
         self.password_hasher    = UserPasswordHasher()
         self.get_form          = {
@@ -30,8 +26,7 @@ class Login(object):
             email       = req.media.get("email", None)
             username    = req.media.get("username", None)
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute(
-                    "SELECT t1.id, CONCAT(t1.firstname, ' ', t1.lastname) AS fullname, t1.password, t1.roles, t1.subscription_exp, t2.id AS tester_key, t2.type AS tester_type, t2.expiration_on AS tester_expiration FROM accounts AS t1 INNER JOIN tester_keys AS t2 ON t1.f_tester_key = t2.id WHERE (t1.id = %s OR t1.email = %s) AND t1.is_banned = FALSE AND t2.type = %s AND t2.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
+                cur.execute("SELECT t2.id, CONCAT(t2.firstname, ' ', t2.lastname) AS fullname, t2.password, t2.roles, t2.subscription_exp, t1.id AS tester_key, t2.activated_on, t2.is_banned FROM tester_keys AS t1 INNER JOIN accounts AS t2 ON t1.f_owner = t2.id WHERE (t2.id = %s OR t2.email = %s) AND t1.type = %s AND t1.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
                     (
                         username,
                         email,
@@ -40,27 +35,41 @@ class Login(object):
                 )
                 q1 = cur.fetchone()
 
-            if q1 is None or not q1:
+            if q1 is None:
                 resp.status = falcon.HTTP_BAD_REQUEST
                 resp.media  = {'title': 'BAD_REQUEST', 'description': 'username or password not found'}
                 return
 
-            fullname: str = q1[1]
-            password: str =q1[2]
-            roles: list = q1[3].split(':')
+            fullname: str   = q1[1]
+            password: str   = q1[2]
+            roles: list     = q1[3]
             subscription_exp = q1[4]
+            tester_key: str      = q1[5]
+            verification_date = q1[6]
+            is_banned = q1[7]
+
+            if is_banned:
+                resp.status = falcon.HTTP_UNAUTHORIZED
+                resp.media  = {'title': 'BAD_REQUEST', 'description': 'your account has been banned'}
+                return
+
+            if verification_date is None or verification_date > datetime.datetime.utcnow():
+                resp.status = falcon.HTTP_BAD_REQUEST
+                resp.media  = {'title': 'BAD_REQUEST', 'description': 'please verify your account'}
+                return
 
             if self.password_hasher.verify_password(password, req.media['password']):
                 if subscription_exp > datetime.datetime.utcnow():
                     roles.append('premium')
 
-                api_message('d', f'pub type {type(AppState.AccountToken.PUBLIC)}')
+                api_message("w", f'fullname : {fullname}')
                 token = self.token_controller.create(
-                    duration=10000000,
+                    duration=10800, # 3 hours in seconds
                     uid=q1[0],
                     roles=roles,
                     fullname=fullname
                 )
+
                 api_message('i', "success login (user_id={0} fullname={1})".format(q1[0], fullname))
                 resp.status = falcon.HTTP_OK
                 resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'username': q1[0], 'fullname': fullname, 'roles': roles, 'token': token}}
