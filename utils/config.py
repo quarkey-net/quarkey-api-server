@@ -62,6 +62,13 @@ class AppState:
         PUBLIC: bytes   = b''
         PRIVATE: bytes  = b''
 
+    class Email:
+        """ Describe Quarkey email account activator credentials"""
+        CONN            = None
+        NAME: str       = os.environ.get("EMAIL_HOST", None)
+        PASS: str       = os.environ.get("EMAIL_PASS", None)
+        PUBLIC_KEY: bytes   = b''
+        PRIVATE_KEY:bytes   = b''
 
 # Apply a configuration according to the tag
 if AppState.TAG in 'dev':
