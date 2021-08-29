@@ -1,5 +1,5 @@
 from __future__ import print_function
-import datetime, falcon, jsonschema, sys, logging, os, random
+import datetime, falcon, jsonschema, sys, logging, os, random, yagmail
 from utils.config import AppState
 
 # EMAIL = yagmail.SMTP(API_DEV_EMAIL_EXPEDITOR, API_DEV_EMAIL_PASSWORD)
@@ -80,8 +80,8 @@ def get_rsa_keypair(token_type: str = None) -> list:
         cur.execute("SELECT public_key, private_key FROM auth_token_rsa WHERE type = %s", (token_type,))
         result = cur.fetchone()
     AppState.Database.CONN.commit()
-    print(f'pubkey : {result[0]}')
     try:
+
         return [result[0], result[1]]
         """         
         RSAKEYS.insert(0, str(q[0]["public_key"]))
@@ -155,3 +155,16 @@ def get_size(obj, seen=None):
     elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
         size += sum([get_size(i, seen) for i in obj])
     return size
+
+def smtp_connect() -> bool:
+    try:
+        AppState.Email.CONN = yagmail.SMTP(
+            user=AppState.Email.NAME, 
+            password=AppState.Email.PASS,
+            smtp_starttls=False,
+            smtp_ssl=True
+        )
+    except Exception as e:
+        api_message("e", f'Failed to connect smtp quarkey email, error : {e}')
+        return False
+    return True
