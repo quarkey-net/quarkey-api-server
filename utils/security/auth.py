@@ -48,12 +48,12 @@ def gen_account_keypair() -> list:
 
 class AccountAuthToken():
 
-    def __init__(self, pubkey, privkey) -> None:
+    def __init__(self, pubkey=None, privkey=None) -> None:
         self._pubkey = pubkey
         self._privkey = privkey
 
     def create(self, duration: int, uid: str, roles: list, fullname: str) -> str:
-        roles: str = ':'.join(roles)
+        api_message("d", f'roles type : {type(roles)}')
         header = {"alg": AppState.AccountToken.TYPE}
         try:
             payload: dict = {
@@ -68,7 +68,7 @@ class AccountAuthToken():
             return jose.jwt.encode(
                 header,
                 payload,
-                AppState.AccountToken.PRIVATE if AppState.AccountToken.TYPE == "RS256" else AppState.AccountToken.SECRET,
+                AppState.AccountToken.PRIVATE_KEY if AppState.AccountToken.TYPE == "RS256" else AppState.AccountToken.SECRET,
                 check=False
             ).decode('utf-8')
         except Exception as e:
@@ -83,7 +83,7 @@ class AccountAuthToken():
             token = bytes(token, encoding="utf-8")
             res = jose.jwt.decode(
                 token, 
-                AppState.AccountToken.PUBLIC if AppState.AccountToken.TYPE == "RS256" else AppState.AccountToken.SECRET
+                AppState.AccountToken.PUBLIC_KEY if AppState.AccountToken.TYPE == "RS256" else AppState.AccountToken.SECRET
             )
             res.validate()
             api_message("d", f'payload token content : {res}')
@@ -97,6 +97,58 @@ class AccountAuthToken():
         except Exception as e:
             api_message('w', f"unknow exception on decode token function : {e}")
             raise falcon.HTTPNotAcceptable(description="Impossible d'authentifier l'utilisateur")
+
+
+
+class EmailAuthToken():
+
+    def __init__(self, pubkey=None, privkey=None) -> None:
+        self._pubkey = pubkey
+        self._privkey = privkey
+
+    def create(self, duration: int, uid: str, tester_key: str) -> str:
+        header = {"alg": "RS256"}
+        try:
+            payload: dict = {
+                'uid': uid,
+                'tester_key': tester_key,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
+            }
+        except Exception as e:
+            api_message('d', f'Failed to deserialize payload : {e}')
+        try:
+            return jose.jwt.encode(
+                header,
+                payload,
+                AppState.Email.PRIVATE_KEY,
+                check=False
+            ).decode('utf-8')
+        except Exception as e:
+            print(f'LOGGING : {AppState.LOGGING_ENABLE}\nSTDOUT : {AppState.STDOUT_ENABLE}\nSTDERR : {AppState.STDERR_ENABLE}')
+            api_message('d', f'{e}')
+            print(e)
+            raise falcon.HTTPInternalServerError(title="email activation token", description=f'{e}')
+
+
+    def decode(self, token: str) -> dict:
+        try:
+            token = bytes(token, encoding="utf-8")
+            res = jose.jwt.decode(
+                token, 
+                AppState.Email.PUBLIC_KEY
+            )
+            res.validate()
+            api_message("d", f'payload token content : {res}')
+            return res
+        except jose.errors.ExpiredTokenError as e:
+            api_message('w', "Account activation token expired")
+            raise falcon.HTTPNotAcceptable(description='Account activation token expired')
+        except jose.errors.BadSignatureError as e:
+            api_message('w', "Signature invalid")
+            raise falcon.HTTPNotAcceptable(description='Invalid activation token')
+        except Exception as e:
+            api_message('w', f"unknow exception on decode token during account activation : {e}")
+            raise falcon.HTTPNotAcceptable(description="Failed to activate account")
 
     
         
@@ -126,20 +178,3 @@ class UserPasswordHasher():
             return False
 
         return False
-
-""" 
-def create_verification_token(duration=300):
-    try:
-        payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=duration),
-            'sub': uuid.uuid4().hex
-        }
-        return jwt.encode(
-            payload,
-            API_JWT_SECRET,
-            algorithm='HS256'
-        )
-    except Exception as e:
-        print(e)
-        raise falcon.HTTPInternalServerError(title="account auth token", description="")
- """
