@@ -158,12 +158,14 @@ def get_size(obj, seen=None):
 
 def smtp_connect() -> bool:
     try:
+        api_message("d", f'email username : {AppState.Email.NAME}')
+        api_message("d", f'email password : {AppState.Email.NAME}')
         AppState.Email.CONN = yagmail.SMTP(
             user=AppState.Email.NAME, 
             password=AppState.Email.PASS,
-            port=465,
-            smtp_starttls=False,
-            smtp_ssl=True,
+            port=587,
+            smtp_starttls=True,
+            smtp_ssl=False,
         )
     except Exception as e:
         api_message("e", f'Failed to connect smtp quarkey email, error : {e}')
