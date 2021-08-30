@@ -64,12 +64,10 @@ class Register(object):
                             )
                         )
                         cur.execute("UPDATE tester_keys SET f_owner = %s WHERE id = %s", (req.media["username"], key_id))
-                        AppState.Database.CONN.commit()
                     except Exception as e:
                         AppState.Database.CONN.rollback()
                         api_message("e", f'Failed transaction : {e}')
                         raise falcon.HTTPBadRequest()
-
                 # gen activation token and send it
                 try:
                     activation_token: str = self._email_token_controller.create(
@@ -83,6 +81,7 @@ class Register(object):
                     api_message("w", f'Failed to send verification email, error : {e}')
                     AppState.Database.CONN.rollback()
                     raise falcon.HTTPBadRequest(title="BAD_REQUEST", description="Failed to send activation email, register aborted!")
+                AppState.Database.CONN.commit()
                 # response success
                 api_message('d', "successfull register (user=\"{0}\", uid={1})".format(req.media['firstname'] + ' ' + req.media['lastname'], req.media['username']))
                 resp.status = falcon.HTTP_201
