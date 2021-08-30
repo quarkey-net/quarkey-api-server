@@ -87,11 +87,6 @@ api.add_route("/api/account/tool/gen/data", ProcessGenData())
 api.add_route("/api/infos", ProcessApiInfos())
 
 
-rconn = redis.Redis.from_url(os.environ.get("REDIS_URL", None))
-rconn.set("foo", "bar")
-print(f'redis foo : {rconn.get("foo")}')
-
-
 if platform.system() == "Linux":
     import bjoern
     bjoern.run(api, host=AppState.HOST, port=AppState.PORT, reuse_port=True)
