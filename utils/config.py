@@ -1,4 +1,6 @@
+from collections import UserString
 import os, logging, pathlib, git
+from falcon.errors import HeaderNotSupported
 
 GIT_CURRENT_TAG: str
 try:
@@ -49,11 +51,17 @@ class AppState:
         """ Describe SQL Database Credentials """
         CONN = None
         TYPE: str = "postgres"
-        NAME: str = os.environ.get("DB_NAME", "tests")
+        NAME: str = os.environ.get("DB_NAME", "tests2")
         HOST: str = os.environ.get("DB_HOST", "127.0.0.1")
         PORT: int = int(os.environ.get("DB_PORT", 5432))
         USER: str = os.environ.get("DB_USER", "postgres")
         PASS: str = os.environ.get("DB_PASS", "root")
+
+    class Redis:
+        CONN = None
+        HOST: str = None
+        PORT: int = None
+        PASS: str = None
         
     class AccountToken:
         """ Describe Account token authentification controller credentials """
@@ -90,6 +98,7 @@ elif AppState.TAG in ['alpha', 'beta', 'stable']:
 if "DATABASE_URL" in os.environ:
     AppState.PORT = int(os.environ.get("PORT"))
     AppState.HOST = "0.0.0.0"
+    # Database (PostgreSQL)
     DB_URL: str = os.environ.get("DATABASE_URL").split("://")[1]
     AppState.Database.TYPE = "postgresql"
     AppState.Database.USER = DB_URL.split(":")[0]
@@ -97,3 +106,11 @@ if "DATABASE_URL" in os.environ:
     AppState.Database.PASS = DB_URL.split(":")[1].split("@")[0]
     AppState.Database.HOST = DB_URL.split("@")[1].split(":")[0]
     AppState.Database.NAME = DB_URL.split("/")[-1]
+    # Redis
+    try:
+        RD_URL: str = os.environ.get("REDIS_URL", None)
+        AppState.Redis.HOST = RD_URL.split("://:")[1].split("@")[1].split(":")[0]
+        AppState.Redis.PORT = int(RD_URL.split("://:")[1].split("@")[1].split(":")[1])
+        AppState.Redis.PASS = RD_URL.split("://:")[1].split("@")[0]
+    except Exception as e:
+        print(f'[WARN] Skip redis configuration for Heroku')
