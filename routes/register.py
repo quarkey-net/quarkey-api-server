@@ -1,4 +1,6 @@
 import falcon, datetime
+
+from git import exc
 from utils.security.auth import EmailAuthToken, UserPasswordHasher, gen_account_keypair
 from utils.config import AppState
 from utils.base import api_validate_form, api_message
@@ -69,14 +71,18 @@ class Register(object):
                         raise falcon.HTTPBadRequest()
 
                 # gen activation token and send it
-                activation_token: str = self._email_token_controller.create(
-                    duration=86400,
-                    uid=req.media["username"],
-                    tester_key=req.media["key"]
-                )
-                activation_link = f'https://quarkey.com/active/account?token={activation_token}'
-                AppState.Email.CONN.send(to=req.media["email"], subject="Quarkey Account Activation", contents=f'Hi {req.media["firstname"]} !\n\nHere is your activation key for your Quarkey account :\n{activation_link}')
-        
+                try:
+                    activation_token: str = self._email_token_controller.create(
+                        duration=86400,
+                        uid=req.media["username"],
+                        tester_key=req.media["key"]
+                    )
+                    activation_link = f'https://quarkey.com/active/account?token={activation_token}'
+                    AppState.Email.CONN.send(to=req.media["email"], subject="Quarkey Account Activation", contents=f'Hi {req.media["firstname"]} !\n\nHere is your activation key for your Quarkey account :\n{activation_link}')
+                except Exception as e:
+                    api_message("w", f'Failed to send verification email, error : {e}')
+                    AppState.Database.CONN.rollback()
+                    raise falcon.HTTPBadRequest(title="BAD_REQUEST", description="Failed to send activation email, register aborted!")
                 # response success
                 api_message('d', "successfull register (user=\"{0}\", uid={1})".format(req.media['firstname'] + ' ' + req.media['lastname'], req.media['username']))
                 resp.status = falcon.HTTP_201
