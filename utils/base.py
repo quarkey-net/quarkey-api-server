@@ -161,8 +161,8 @@ def smtp_connect() -> bool:
         AppState.Email.CONN = yagmail.SMTP(
             user=AppState.Email.NAME, 
             password=AppState.Email.PASS,
-            port=993,
-            smtp_starttls=True,
+            port=465,
+            smtp_starttls=False,
             smtp_ssl=True,
         )
     except Exception as e:
