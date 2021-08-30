@@ -2,7 +2,7 @@
 # Author    : Esteban Ristich <esteban.ristich@protonmail.com>
 # License   : MIT
 
-import platform, os, logging, falcon, argparse
+import platform, os, logging, falcon, argparse, redis
 from database.database import PGDatabase
 from routes.register import Register
 
@@ -85,6 +85,12 @@ api.add_route("/api/account/item/password/link/to/tag", ProcessLinkTag())
 # private (only moderator && admin) and debug endpoint
 api.add_route("/api/account/tool/gen/data", ProcessGenData())
 api.add_route("/api/infos", ProcessApiInfos())
+
+
+rconn = redis.Redis.from_url(os.environ.get("REDIS_URL", None))
+rconn.set("foo", "bar")
+print(f'redis foo : {rconn.get("foo")}')
+
 
 if platform.system() == "Linux":
     import bjoern
