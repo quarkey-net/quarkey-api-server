@@ -159,7 +159,7 @@ def get_size(obj, seen=None):
 def smtp_connect() -> bool:
     try:
         api_message("d", f'email username : {AppState.Email.NAME}')
-        api_message("d", f'email password : {AppState.Email.NAME}')
+        api_message("d", f'email password : {AppState.Email.PASS}')
         AppState.Email.CONN = yagmail.SMTP(
             user=AppState.Email.NAME, 
             password=AppState.Email.PASS,
