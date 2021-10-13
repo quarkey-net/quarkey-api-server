@@ -20,10 +20,10 @@ class DebugMiddleware(object):
 class AcceptJSONMiddleware(object):
 
     def process_request(self, req, resp):
-        if falcon.content_type is None and req.method == "GET":
+        if req.content_type is None and req.method == "GET":
             return
 
-        if falcon.MEDIA_URLENCODED in req.content_type and req.method == "GET":
+        if req.MEDIA_URLENCODED in req.content_type and req.method == "GET":
             return
 
         if not req.client_accepts_json:
