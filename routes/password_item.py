@@ -91,6 +91,7 @@ class PasswordItem(object):
             resp.media = {"title": "BAD_REQUEST", "description": "failed to get password items"}
             return
         elif len(q1) < 1:
+            resp.status = falcon.HTTP_200
             resp.media = {"title": "BAD_REQUEST", "description": "empty password items"}
             return
         
