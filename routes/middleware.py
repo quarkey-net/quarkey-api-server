@@ -21,7 +21,9 @@ class AcceptJSONMiddleware(object):
         if not req.client_accepts_json:
             raise falcon.HTTPNotAcceptable('This API only supports responses encoded as JSON.')
 
-        if req.content_type == None or falcon.MEDIA_JSON not in req.content_type:
+        if req.content_type == falcon.MEDIA_URLENCODED and req.method == 'GET':
+            pass
+        elif req.content_type == None or falcon.MEDIA_JSON not in req.content_type:
             raise falcon.HTTPUnsupportedMediaType('This API only supports requests encoded as JSON.')
             
 
