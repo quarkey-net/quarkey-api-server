@@ -20,9 +20,15 @@ class DebugMiddleware(object):
 class AcceptJSONMiddleware(object):
 
     def process_request(self, req, resp):
-        if not req.client_accepts_json:
-            raise falcon.HTTPNotAcceptable('This API only supports responses encoded as JSON.')
 
+        if req.content_type is None or req.content_type == falcon.MEDIA_URLENCODED and req.method == "GET":
+            pass
+        elif not req.client_accepts_json:
+            raise falcon.HTTPNotAcceptable('This API only supports responses encoded as JSON.')
+        elif req.content_type is None:
+            raise falcon.HTTPNotAcceptable('This API only supports responses encoded as JSON.')
+        else:
+            raise falcon.HTTPNotAcceptable('This API only supports responses encoded as JSON.')
         """
         if req.content_type == falcon.MEDIA_URLENCODED and req.method == 'GET':
             pass
