@@ -23,7 +23,7 @@ class AcceptJSONMiddleware(object):
         if req.content_type is None and req.method == "GET":
             return
 
-        if req.MEDIA_URLENCODED in req.content_type and req.method == "GET":
+        if falcon.MEDIA_URLENCODED in req.content_type and req.method == "GET":
             return
 
         if not req.client_accepts_json:
