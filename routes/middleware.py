@@ -9,10 +9,12 @@ from utils.base import api_message
 class DebugMiddleware(object):
 
     def process_request(self, req, resp):
-        api_message('d', f'[MIDDLEWARE][{req.path}] <= {req.media}')
+        # api_message('d', f'[MIDDLEWARE][{req.path}] <= {req.media}')
+        pass
 
     def process_response(self, req, resp, resource, req_succeeded):
-        api_message('d', f'[MIDDLEWARE][{req.path}] => {resp.media}')
+        # api_message('d', f'[MIDDLEWARE][{req.path}] => {resp.media}')
+        pass
 
 
 class AcceptJSONMiddleware(object):
