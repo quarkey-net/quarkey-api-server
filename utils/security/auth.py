@@ -58,7 +58,7 @@ class AccountAuthToken():
         try:
             payload: dict = {
                 'uid': uid,
-                'fullname': fullname,
+                'username': fullname,
                 'roles': roles,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
             }
@@ -106,11 +106,12 @@ class EmailAuthToken():
         self._pubkey = pubkey
         self._privkey = privkey
 
-    def create(self, duration: int, uid: str, tester_key: str) -> str:
+    def create(self, duration: int, uid: str, tester_key: str, fullname: str) -> str:
         header = {"alg": "RS256"}
         try:
             payload: dict = {
                 'uid': uid,
+                'username': fullname, 
                 'tester_key': tester_key,
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=duration)
             }
