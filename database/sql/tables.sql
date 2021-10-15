@@ -7,10 +7,9 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 
 CREATE TABLE IF NOT EXISTS accounts (
-    id                  VARCHAR(24) PRIMARY KEY NOT NULL UNIQUE,
+    id                  UUID PRIMARY KEY NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
 
-    firstname           VARCHAR(20) NOT NULL,
-    lastname            VARCHAR(20) NOT NULL,
+    username            VARCHAR(20) NOT NULL,
     email               VARCHAR(150) NOT NULL UNIQUE,
     password            VARCHAR(256) NOT NULL,
 
@@ -31,8 +30,8 @@ CREATE TABLE IF NOT EXISTS accounts (
 CREATE TABLE IF NOT EXISTS tester_keys (
     id                  VARCHAR(20) PRIMARY KEY NOT NULL UNIQUE,
     type                VARCHAR(6) NOT NULL,
-    f_owner             VARCHAR(24) UNIQUE DEFAULT NULL,
-    f_refferer          VARCHAR(24) NOT NULL,
+    f_owner             UUID UNIQUE DEFAULT NULL,
+    f_refferer          UUID NOT NULL,
     email_recipient     VARCHAR(150) NULL,
     expiration_on       TIMESTAMP WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'utc'),
     created_on          TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT (NOW() AT TIME ZONE 'utc'),
@@ -47,7 +46,7 @@ CREATE TABLE IF NOT EXISTS tester_keys (
 
 CREATE TABLE IF NOT EXISTS passwords (
     id                  UUID PRIMARY KEY NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
-    f_owner             VARCHAR(24) NOT NULL,
+    f_owner             UUID NOT NULL,
     type                VARCHAR(10) NOT NULL DEFAULT 'basic',
     name                VARCHAR(24) NOT NULL,
     description         VARCHAR(255) DEFAULT NULL,
@@ -66,7 +65,7 @@ CREATE TABLE IF NOT EXISTS passwords (
 
 CREATE TABLE IF NOT EXISTS tags (
     id                  UUID PRIMARY KEY NOT NULL UNIQUE DEFAULT uuid_generate_v4(),
-    f_owner             VARCHAR(24) NOT NULL,
+    f_owner             UUID NOT NULL,
     name                VARCHAR(20) NOT NULL,
     color               VARCHAR(8) DEFAULT NULL,
     icon                VARCHAR(40) DEFAULT NULL,
