@@ -52,12 +52,13 @@ class Login(object):
                 resp.media  = {'title': 'BAD_REQUEST', 'description': 'Your account has been banned'}
                 return
 
-            if verification_date is None or verification_date > datetime.datetime.utcnow():
-                resp.status = falcon.HTTP_ALREADY_REPORTED
-                resp.media  = {'title': 'BAD_REQUEST', 'description': 'Please verify your account'}
-                return
-
             if self.password_hasher.verify_password(password, req.media['password']):
+
+                if verification_date is None or verification_date > datetime.datetime.utcnow():
+                    resp.status = falcon.HTTP_ALREADY_REPORTED
+                    resp.media  = {'title': 'BAD_REQUEST', 'description': 'Please verify your account'}
+                    return
+
                 if subscription_exp > datetime.datetime.utcnow():
                     roles.append('premium')
 
