@@ -1,3 +1,4 @@
+from typing import Any
 import falcon, datetime
 from utils.base import api_message, api_validate_form
 from utils.security.auth import AccountAuthToken, UserPasswordHasher
@@ -12,11 +13,11 @@ class Login(object):
             "$schema": AppState.Tools.JSONSCHEMA_VERSION,
             "type": "object",
             "properties": {
-                "username"  : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,24}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
+                # "username"  : {"type": "string", "pattern": "^(?=[a-zA-Z0-9._]{3,24}$)(?!.*[_.]{2})[^_.].*[^_.]$"},
                 "email"     : {"type": "string", "format": "email", "pattern": "^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$"},
                 "password"  : {"type": "string", "pattern": "^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,60}$"}
             },
-            "required": ["password"]
+            "required": ["email", "password"]
         }
 
     def on_post(self, req, resp):
@@ -24,11 +25,9 @@ class Login(object):
         if api_validate_form(req.media, self.get_form):
             q1 = None
             email       = req.media.get("email", None)
-            username    = req.media.get("username", None)
             with AppState.Database.CONN.cursor() as cur:
-                cur.execute("SELECT t2.id, CONCAT(t2.firstname, ' ', t2.lastname) AS fullname, t2.password, t2.roles, t2.subscription_exp, t1.id AS tester_key, t2.activated_on, t2.is_banned FROM tester_keys AS t1 INNER JOIN accounts AS t2 ON t1.f_owner = t2.id WHERE (t2.id = %s OR t2.email = %s) AND t1.type = %s AND t1.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
+                cur.execute("SELECT t2.id, t2.username, t2.password, t2.roles, t2.subscription_exp, t1.id AS tester_key, t2.activated_on, t2.is_banned FROM tester_keys AS t1 INNER JOIN accounts AS t2 ON t1.f_owner = t2.id WHERE t2.email = %s AND t1.type = %s AND t1.expiration_on > CURRENT_TIMESTAMP LIMIT 1",
                     (
-                        username,
                         email,
                         AppState.TAG
                     )
@@ -37,7 +36,7 @@ class Login(object):
 
             if q1 is None:
                 resp.status = falcon.HTTP_BAD_REQUEST
-                resp.media  = {'title': 'BAD_REQUEST', 'description': 'username or password not found'}
+                resp.media  = {'title': 'BAD_REQUEST', 'description': 'Email or password not found'}
                 return
 
             fullname: str   = q1[1]
@@ -50,12 +49,12 @@ class Login(object):
 
             if is_banned:
                 resp.status = falcon.HTTP_UNAUTHORIZED
-                resp.media  = {'title': 'BAD_REQUEST', 'description': 'your account has been banned'}
+                resp.media  = {'title': 'BAD_REQUEST', 'description': 'Your account has been banned'}
                 return
 
             if verification_date is None or verification_date > datetime.datetime.utcnow():
-                resp.status = falcon.HTTP_BAD_REQUEST
-                resp.media  = {'title': 'BAD_REQUEST', 'description': 'please verify your account'}
+                resp.status = falcon.HTTP_ALREADY_REPORTED
+                resp.media  = {'title': 'BAD_REQUEST', 'description': 'Please verify your account'}
                 return
 
             if self.password_hasher.verify_password(password, req.media['password']):
@@ -72,9 +71,9 @@ class Login(object):
 
                 api_message('i', "success login (user_id={0} fullname={1})".format(q1[0], fullname))
                 resp.status = falcon.HTTP_OK
-                resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'username': q1[0], 'fullname': fullname, 'roles': roles, 'token': token}}
+                resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'uid': q1[0], 'username': fullname, 'roles': roles, 'token': token}}
                 return
             else:
                 resp.status = falcon.HTTP_BAD_REQUEST
-                resp.media  = {'title': 'BAD_REQUEST', 'description': 'username or password not found'}
+                resp.media  = {'title': 'BAD_REQUEST', 'description': 'Email or password not found'}
                 return
