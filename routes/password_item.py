@@ -118,7 +118,7 @@ class PasswordItem(object):
             results.append(pass_itm)
 
         resp.status = falcon.HTTP_OK
-        resp.media  = {"title": "OK", "description": "password list getted successful", "content": {"username": payload["uid"], "fullname": payload["fullname"], "items" : results}}
+        resp.media  = {"title": "OK", "description": "password list getted successful", "content": {"username": payload["uid"], "username": payload["username"], "items" : results}}
         return
 
 
