@@ -23,6 +23,9 @@ class PasswordItem(object):
             "required": ["name", "password"]
         }
 
+    def on_options(self, req, resp):
+        resp.set_header('Access-Control-Allow-Headers', '*')
+
     @falcon.before(AuthorizeResource(roles=['standard']))
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_400
@@ -117,6 +120,7 @@ class PasswordItem(object):
                     pass_itm["tags"].append(tag_itm)
             results.append(pass_itm)
 
+        resp.set_header("Access-Control-Allow-Credentials", "true")
         resp.status = falcon.HTTP_OK
         resp.media  = {"title": "OK", "description": "password list getted successful", "content": {"username": payload["uid"], "username": payload["username"], "items" : results}}
         return

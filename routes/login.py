@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Literal
 import falcon, datetime
 from utils.base import api_message, api_validate_form
 from utils.security.auth import AccountAuthToken, UserPasswordHasher
@@ -55,7 +55,7 @@ class Login(object):
             if self.password_hasher.verify_password(password, req.media['password']):
 
                 if verification_date is None or verification_date > datetime.datetime.utcnow():
-                    resp.status = falcon.HTTP_ALREADY_REPORTED
+                    resp.status = 350
                     resp.media  = {'title': 'BAD_REQUEST', 'description': 'Please verify your account'}
                     return
 
@@ -69,10 +69,12 @@ class Login(object):
                     roles=roles,
                     fullname=fullname
                 )
-
+                
                 api_message('i', "success login (user_id={0} fullname={1})".format(q1[0], fullname))
                 resp.status = falcon.HTTP_OK
-                resp.media  = {'title': 'OK', 'description': 'success to login', 'content': {'uid': q1[0], 'username': fullname, 'roles': roles, 'token': token}}
+                resp.set_header("Access-Control-Allow-Credentials", "true")
+                resp.set_cookie(name="Token-Account", value=token, http_only=True, max_age=10800, secure=False, domain=".app.localhost", same_site="None")
+                resp.media  = {'title': 'OK', 'description': 'Success to login', 'content': {'uid': q1[0], 'username': fullname, 'roles': roles, 'token': token}}
                 return
             else:
                 resp.status = falcon.HTTP_BAD_REQUEST

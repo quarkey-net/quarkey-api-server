@@ -10,6 +10,7 @@ class DebugMiddleware(object):
 
     def process_request(self, req, resp):
         # api_message('d', f'[MIDDLEWARE][{req.path}] <= {req.media}')
+        print(f'COOKIE : {req.cookies}')
         pass
 
     def process_response(self, req, resp, resource, req_succeeded):
@@ -40,10 +41,12 @@ class AcceptJSONMiddleware(object):
 class CORSMiddleware(object):
     
     def process_request(self, req, resp):
-        resp.set_header('Access-Control-Allow-Origin', '*')
-        resp.set_header('Access-Control-Allow-Methods', '*')
-        resp.set_header('Access-Control-Allow-Headers', '*')
-        resp.set_header('Access-Control-Max-Age', 3600)  # 20 days
+        # resp.set_header('Origin', 'http://localhost:8080')
+        resp.set_header('Access-Control-Allow-Credentials', 'true')
+        resp.set_header('Access-Control-Allow-Origin', req.get_header("Origin"))
+        # resp.set_header('Access-Control-Allow-Methods', '*')
+        resp.set_header('Access-Control-Allow-Headers', 'Content-Type, Accept, Vary, Origin, Referer, Host')
+        # resp.set_header('Access-Control-Max-Age', 3600)  # 20 days
         #api_message('WARNING', f'{req.headers}')
         if req.method == 'OPTIONS':
             raise falcon.HTTPStatus(falcon.HTTP_200, body='\n')
