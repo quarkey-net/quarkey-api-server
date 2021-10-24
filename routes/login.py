@@ -73,7 +73,7 @@ class Login(object):
                 api_message('i', "success login (user_id={0} fullname={1})".format(q1[0], fullname))
                 resp.status = falcon.HTTP_OK
                 resp.set_header("Access-Control-Allow-Credentials", "true")
-                resp.set_cookie(name="Token-Account", value=token, http_only=True, max_age=10800, secure=False, domain=".app.localhost", same_site="None")
+                resp.set_cookie(name="Token-Account", value=token, http_only=True, max_age=10800, secure=True, domain=req.get_header("Host"), same_site="Lax", path="/")
                 resp.media  = {'title': 'OK', 'description': 'Success to login', 'content': {'uid': q1[0], 'username': fullname, 'roles': roles, 'token': token}}
                 return
             else:
