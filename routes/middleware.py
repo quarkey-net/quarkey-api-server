@@ -75,7 +75,9 @@ class AuthorizeResource:
 
     def __call__(self, req, resp, resource, params):
         api_message("d", f'[HOOK] resource : {req.path}, require roles : {self._roles}')
-        token = req.get_header('Authorization')
+        # token = req.get_header('Authorization')
+        token = req.get_cookie_values("Token-Account")
+        # req.set_header("Authorization", token)
         if token is None:
             raise falcon.HTTPUnauthorized(title="UNAUTHORIZED", description="this resource require account token")
         payload = self._token_controller.decode(token)

@@ -30,7 +30,8 @@ class PasswordItem(object):
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_400
         if api_validate_form(req.media, self.post_form):
-            payload = self._token_controller.decode(req.get_header('Authorization'))
+            # payload = self._token_controller.decode(req.get_header('Authorization'))
+            payload = self._token_controller.decode(req.get_cookie_values("Authorization"))
             q1 = None
             with AppState.Database.CONN.cursor() as cur:
                 cur.execute("SELECT id FROM passwords WHERE f_owner = %s AND name = %s", (payload['uid'], req.media['name']))
@@ -74,7 +75,8 @@ class PasswordItem(object):
     @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
-        payload = self._token_controller.decode(req.get_header('Authorization'))
+        # payload = self._token_controller.decode(req.get_header('Authorization'))
+        payload = self._token_controller.decode(req.get_cookie_values("Authorization"))
         q1 = None
         q2 = None
         password_columns = None
@@ -95,10 +97,29 @@ class PasswordItem(object):
             return
         elif len(q1) < 1:
             resp.status = falcon.HTTP_200
-            resp.media = {"title": "BAD_REQUEST", "description": "empty password items"}
+            resp.media = {"title": "BAD_REQUEST", "description": "empty password items", "content": {"item_number": 0, "item": []}}
             return
-        
-        results: list = []
+
+
+        tag_list_id: list = []
+        for i in q2:
+            tag_list_id.append(uuid.UUID(i[1]).hex)
+        tag_list_id = list(set(tag_list_id))
+
+
+        tag_slot: list = []
+        for c in tag_list_id:
+            for z in q2:
+                if uuid.UUID(z[1]).hex == c:
+                    if z[2] != 'global':
+                        tag_slot.append({
+                            "id": c,
+                            "name": z[2],
+                            "color": z[3],
+                            "items": []
+                        })
+
+        items: list = []
         for x in q1:
             pass_itm: dict = {}
             pass_itm["id"]      = uuid.UUID(x[0]).hex
@@ -118,11 +139,32 @@ class PasswordItem(object):
                     tag_itm["name"] = y[2]
                     tag_itm["color"] = y[3]
                     pass_itm["tags"].append(tag_itm)
-            results.append(pass_itm)
+            items.append(pass_itm)
+
+        tag_slot: list = []
+        for c in tag_list_id:
+            for z in q2:
+                if uuid.UUID(z[1]).hex == c:
+                    if z[2] != 'global':
+                        slot = {
+                            "id": c,
+                            "name": z[2],
+                            "color": z[3],
+                            "items": []
+                        }
+                        for v in items:
+                            for u in v["tags"]:
+                                if c == u["id"]:
+                                    slot["items"].append(v["id"])
+                                    break
+                        tag_slot.append(slot)
+                                    
+        
+
 
         resp.set_header("Access-Control-Allow-Credentials", "true")
         resp.status = falcon.HTTP_OK
-        resp.media  = {"title": "OK", "description": "password list getted successful", "content": {"username": payload["uid"], "username": payload["username"], "items" : results}}
+        resp.media  = {"title": "OK", "description": "password list getted successful", "content": {"username": payload["uid"], "username": payload["username"], "item_number": len(items), "items" : items, "tag_slot": tag_slot}}
         return
 
 
