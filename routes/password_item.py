@@ -31,7 +31,7 @@ class PasswordItem(object):
         resp.status = falcon.HTTP_400
         if api_validate_form(req.media, self.post_form):
             # payload = self._token_controller.decode(req.get_header('Authorization'))
-            payload = self._token_controller.decode(req.get_cookie_values("Token-Account"))
+            payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
             q1 = None
             with AppState.Database.CONN.cursor() as cur:
                 cur.execute("SELECT id FROM passwords WHERE f_owner = %s AND name = %s", (payload['uid'], req.media['name']))
@@ -76,7 +76,7 @@ class PasswordItem(object):
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
         # payload = self._token_controller.decode(req.get_header('Authorization'))
-        payload = self._token_controller.decode(req.get_cookie_values("Token-Account"))
+        payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
         q1 = None
         q2 = None
         password_columns = None
