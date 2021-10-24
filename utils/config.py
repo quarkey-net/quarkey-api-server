@@ -51,11 +51,11 @@ class AppState:
         """ Describe SQL Database Credentials """
         CONN = None
         TYPE: str = "postgres"
-        NAME: str = os.environ.get("DB_NAME", "tests2")
+        NAME: str = os.environ.get("DB_NAME", "quarkey_dev")
         HOST: str = os.environ.get("DB_HOST", "127.0.0.1")
         PORT: int = int(os.environ.get("DB_PORT", 5432))
-        USER: str = os.environ.get("DB_USER", "postgres")
-        PASS: str = os.environ.get("DB_PASS", "root")
+        USER: str = os.environ.get("DB_USER", "quarkey_dev")
+        PASS: str = os.environ.get("DB_PASS", "quarkey_dev")
 
     class Redis:
         CONN = None
