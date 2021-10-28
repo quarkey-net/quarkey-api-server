@@ -30,7 +30,7 @@ class PasswordItem(object):
     def on_post(self, req, resp):
         resp.status = falcon.HTTP_400
         if api_validate_form(req.media, self.post_form):
-            # payload = self._token_controller.decode(req.get_header('Authorization'))
+            # payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
             payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
             q1 = None
             with AppState.Database.CONN.cursor() as cur:
@@ -75,7 +75,7 @@ class PasswordItem(object):
     @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_BAD_REQUEST
-        # payload = self._token_controller.decode(req.get_header('Authorization'))
+        # payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
         payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
         q1 = None
         q2 = None
@@ -172,12 +172,12 @@ class PasswordItem(object):
     @falcon.before(AuthorizeResource(roles=["standard"]))
     def on_delete(self, req, resp):
         resp.status = falcon.HTTP_400
-        payload = self._token_controller.decode(req.get_header('Authorization'))
+        payload = self._token_controller.decode(req.get_cookie_values("Token-Account")[0])
         password_id = req.get_param("password_id")
         tag_global_id = None
         with AppState.Database.CONN.cursor() as cur:
             cur.execute("SELECT t2.id FROM password_tag_linkers AS t1 INNER JOIN tags AS t2 ON t1.f_tag = t2.id WHERE t1.f_password = %s AND t2.f_owner = %s AND t2.name = 'global'", (password_id, payload["uid"]))
-            tag_global_id = cur.fetchone()[0].hex
+            tag_global_id = uuid.UUID(cur.fetchone()[0]).hex
 
         if tag_global_id is None:
             return
