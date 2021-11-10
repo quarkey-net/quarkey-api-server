@@ -90,13 +90,13 @@ class AccountAuthToken():
             return res
         except jose.errors.ExpiredTokenError as e:
             api_message('w', "Connection Expired (Signature invalid)")
-            raise falcon.HTTPNotAcceptable(description='Signature expired. Please log in again.')
+            raise falcon.HTTPUnauthorized(description='Signature expired. Please log in again.')
         except jose.errors.BadSignatureError as e:
             api_message('w', "Signature Key Invalid. Please login again")
-            raise falcon.HTTPNotAcceptable(description='Invalid token. Please log in again.')
+            raise falcon.HTTPForbidden(description='Invalid token. Please log in again.')
         except Exception as e:
             api_message('w', f"unknow exception on decode token function : {e}")
-            raise falcon.HTTPNotAcceptable(description="Impossible d'authentifier l'utilisateur")
+            raise falcon.HTTPForbidden(description="Impossible d'authentifier l'utilisateur")
 
 
 
